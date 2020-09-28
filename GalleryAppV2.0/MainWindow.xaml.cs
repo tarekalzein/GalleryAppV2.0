@@ -113,19 +113,34 @@ namespace GalleryAppV2._0
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void NewFolder_Button_Click(object sender, RoutedEventArgs e)
         {
             if(ContentTreeView.SelectedItem==null)
             {
-                folderManager.AddNewFolder("new folder");
-                LoadTreeViewItems();                
+                FolderDialog dialog = new FolderDialog();
+                dialog.ShowDialog();
+                if(dialog.DialogResult == true)
+                {
+                    folderManager.AddNewFolder(dialog.GetFolderName());
+                    LoadTreeViewItems();
+                }
+               
             }
             else
             {
-                
+                TreeViewItem item = (TreeViewItem)ContentTreeView.SelectedItem;
+                if(item.Tag is FolderItem)
+                {
+                    FolderItem currentFolder = (FolderItem)item.Tag;
+                    FolderDialog dialog = new FolderDialog();
+                    dialog.ShowDialog();
+                    if (dialog.DialogResult == true)
+                    {
+                       
+                    }
+                }
 
             }
-
         }
     }
 }

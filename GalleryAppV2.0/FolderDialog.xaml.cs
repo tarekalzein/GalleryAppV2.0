@@ -21,5 +21,32 @@ namespace GalleryAppV2._0
         {
             InitializeComponent();
         }
+        public FolderDialog(string oldName)
+        {
+            InitializeComponent();
+            FolderName_txtbox.Text = oldName;
+        }
+
+        private void Ok_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if(!string.IsNullOrEmpty(FolderName_txtbox.Text))
+            {
+                this.DialogResult = true;
+            }
+            else
+            {
+                MessageBox.Show("Folder name can't be empty");
+            }
+
+        }
+        private void Cancel_Button_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+        }
+
+        public string GetFolderName()
+        {
+            return FolderName_txtbox.Text;
+        }
     }
 }

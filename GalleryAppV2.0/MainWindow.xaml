@@ -22,7 +22,7 @@
             <Grid Grid.Column="0">
                 <DockPanel>
                     <ToolBar ToolBarTray.IsLocked="True" OverflowMode="Never" Background="White" DockPanel.Dock="Top">
-                        <Button Height="25" Width="25" Click="Button_Click">
+                        <Button Height="25" Width="25" Click="NewFolder_Button_Click">
                             <Image Source="toolbargraphics/icons8-add-folder-64.png"/>
                         </Button>
                         <Button Height="25" Width="25">
