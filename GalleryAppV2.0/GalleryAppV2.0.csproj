@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>GalleryAppV2._0</RootNamespace>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\icons8-folder-48.png" />
+    <None Remove="Assets\icons8-photo-gallery-100.png" />
+    <None Remove="toolbargraphics\icons8-add-folder-64.png" />
+    <None Remove="toolbargraphics\icons8-delete-64.png" />
+    <None Remove="toolbargraphics\icons8-edit-64.png" />
+    <None Remove="toolbargraphics\icons8-photo-gallery-64.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BusinessLayer\BusinessLayer.csproj" />
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\icons8-folder-48.png" />
+    <Resource Include="Assets\icons8-photo-gallery-100.png" />
+    <Resource Include="toolbargraphics\icons8-add-folder-64.png" />
+    <Resource Include="toolbargraphics\icons8-delete-64.png" />
+    <Resource Include="toolbargraphics\icons8-edit-64.png" />
+    <Resource Include="toolbargraphics\icons8-photo-gallery-64.png" />
+  </ItemGroup>
+
+</Project>
