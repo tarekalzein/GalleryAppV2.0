@@ -16,7 +16,7 @@ namespace BusinessLayer
         /// </summary>
         public AlbumManager()
         {
-            //albumList = new TestClass().GetAlbums();
+            albumList = new TestClass().GetAlbums();
         }
         /// <summary>
         /// Method to retrieve a list of all albums in the current album manager.
@@ -53,6 +53,10 @@ namespace BusinessLayer
         public Album GetAlbumAtIndex(int index)
         {
             return albumList[index];
+        }
+        public int Count()
+        {
+            return albumList.Count;
         }
     }
 }

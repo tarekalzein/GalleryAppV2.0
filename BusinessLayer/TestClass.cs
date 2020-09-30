@@ -23,7 +23,15 @@ namespace BusinessLayer
             list.Add(new Album("Album 8", "Description of Album 8"));
             list.Add(new Album("Album 9", "Description of Album 9"));
 
+            list[0].MediaFiles.Add(new ImageFile("iamge 1", "this is an image descriptionthis is an image descriptionthis is an image descriptionthis is an image descriptionthis is an image descriptionthis is an image descriptionthis is an image descriptionthis is an image description", "Assets/test_image.jpg"));
             list[0].MediaFiles.Add(new ImageFile("iamge 1", "this is an image description", "Assets/test_image.jpg"));
+            list[0].MediaFiles.Add(new ImageFile("iamge 1", "this is an image description", "Assets/test_image.jpg"));
+            list[0].MediaFiles.Add(new ImageFile("iamge 1", "this is an image description", "Assets/test_image.jpg"));
+            list[0].MediaFiles.Add(new ImageFile("iamge 1", "this is an image description", "Assets/icons8-photo-gallery-100.png"));
+            list[0].MediaFiles.Add(new ImageFile("iamge 1", "this is an image description", "Assets/test_image.jpg"));
+            list[0].MediaFiles.Add(new ImageFile("iamge 1", "this is an image description", "Assets/test_image.jpg"));
+            list[0].MediaFiles.Add(new ImageFile("iamge 1", "this is an image description", "Assets/test_image.jpg"));
+
         }
 
         public ObservableCollection<Album> GetAlbums()

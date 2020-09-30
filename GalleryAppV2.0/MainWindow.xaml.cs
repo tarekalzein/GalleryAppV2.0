@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media.Imaging;
 using BusinessLayer;
-
+using Microsoft.Win32;
 
 namespace GalleryAppV2._0
 {
@@ -13,134 +17,164 @@ namespace GalleryAppV2._0
     /// </summary>
     public partial class MainWindow : Window
     {
-        FolderManager folderManager;
+        AlbumManager albumManager = new AlbumManager();
+        private int openAlbumIndex= -1;
+        private Dictionary<MediaFile, bool> toggleHelper = new Dictionary<MediaFile, bool>();
+        private Slideshow slideshow = new Slideshow();
+
+
         public MainWindow()
         {
             InitializeComponent();
-            folderManager = new FolderManager();
-
-            #region For testing:
-            folderManager.AddNewFolder("Test1");
-            folderManager.AddNewFolder("Test2");
-            folderManager.AddNewFolder("Test3");
-            folderManager.AddNewFolder("Test4");
-            folderManager.AddNewFolder("Test5");
-
-
-            folderManager.GetFolderAtIndex(1).AddSubFolder();
-            folderManager.GetFolderAtIndex(1).SubFolders[0].AddSubFolder();
-            folderManager.GetFolderAtIndex(1).SubFolders[0].SubFolders[0].AddSubFolder();
-
-            folderManager.GetFolderAtIndex(0).AlbumManager.AddNewAlbum(new Album("Test Album", "Some Description"));
-            #endregion
-
-
+            slideshow = new Slideshow();
             InitializeGUI();
         }
 
         private void InitializeGUI()
         {
-            LoadTreeViewItems();
+            AlbumsTv.ItemsSource = albumManager.GetAlbums();
+            slideshow_datagrid.ItemsSource = slideshow.SlideshowItems;
+            slideshow = new Slideshow();
+
         }
 
-        private void LoadTreeViewItems()
+        private void NewAlbum_Button_Click(object sender, RoutedEventArgs e)
         {
-            ContentTreeView.Items.Clear();
-            foreach (FolderItem folder in folderManager.GetApplicationFolders())
+            NewDialog dialog = new NewDialog();
+            dialog.ShowDialog();
+            if (dialog.DialogResult == true)
             {
-                ContentTreeView.Items.Add(CreateTreeItem(folder));
+                albumManager.AddNewAlbum(new Album(dialog.GetFolderName(), dialog.GetFolderDescription()));
             }
         }
 
-        private TreeViewItem CreateTreeItem(object o)
+        private void Edit_Button_Click(object sender, RoutedEventArgs e)
         {
-            TreeViewItem item = new TreeViewItem();
+            int index= AlbumsTv.Items.IndexOf(AlbumsTv.SelectedItem);
+            MessageBox.Show(index.ToString());            
+        }
 
-            StackPanel stackPanel = new StackPanel();
-            stackPanel.Orientation = Orientation.Horizontal;
-
-            Image img = new Image();
-            img.Width = 16;
-            img.Height = 16;
-
-            Label lbl = new Label();
-
-            if (o is FolderItem)
+        private void import_fileDialogue_Click(object sender, RoutedEventArgs e)
+        {
+            if(openAlbumIndex!=-1 && openAlbumIndex <albumManager.Count())
             {
-                //item.Header = (o as FolderItem).FolderName;
-                lbl.Content = (o as FolderItem).FolderName;
-                img.Source = new BitmapImage(new Uri("Assets/icons8-folder-48.png", UriKind.RelativeOrAbsolute));
-                stackPanel.Children.Add(img);
-                stackPanel.Children.Add(lbl);
-
-                item.Header = stackPanel;
-
-                if ((o as FolderItem).SubFolders != null && (o as FolderItem).SubFolders.Count > 0)
+                Album album = albumManager.GetAlbumAtIndex(openAlbumIndex);
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.Filter =
+                    "Image files (*.JPG;*.PNG)|*.JPG;*.PNG|" +
+                    "Video files (*.WMV;*.MP4)|*.WMV;*.MP4|" +
+                    "All supported files|*.JPG;*.PNG;*.WMV;*.MP4";
+                openFileDialog.FilterIndex = 3;
+                openFileDialog.Multiselect = true;
+                if (openFileDialog.ShowDialog() == true)
                 {
-                    foreach (FolderItem subfolder in (o as FolderItem).SubFolders)
+                    foreach (var filePath in openFileDialog.FileNames)
                     {
-                        item.Items.Add(CreateTreeItem(subfolder)); //Recurring to same method to do all check again (add subfolders in subfolders).
+                        string extension = Path.GetExtension(filePath);
+                        string fileName = Path.GetFileName(filePath);
+
+                        if (album.MediaFiles.Any(o => o.FilePath == filePath))
+                        {
+                            MessageBoxResult result = MessageBox.Show($"{fileName} already exists in this album, would you like to add it anyway?",
+                                    "File already exists",
+                                    MessageBoxButton.YesNo);
+                            switch (result)
+                            {
+                                case MessageBoxResult.Yes:
+                                    switch (extension)
+                                    {
+                                        case ".jpg":
+                                        case ".png":
+                                            album.MediaFiles.Add(new ImageFile(fileName, "", filePath));
+                                            break;
+                                        case ".wmv":
+                                        case ".mp4":
+                                            album.MediaFiles.Add(new VideoFile(fileName, "", filePath));
+                                            break;
+                                    }
+                                    break;
+                                case MessageBoxResult.No:
+                                    //Do Nothing
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                switch (extension)
+                                {
+                                    case ".jpg":
+                                    case ".png":
+                                        album.MediaFiles.Add(new ImageFile(fileName, "", filePath));
+                                        break;
+                                    case ".wmv":
+                                    case ".mp4":
+                                        album.MediaFiles.Add(new VideoFile(fileName, "", filePath));
+                                        break;
+                                }
+                            }
+                            catch
+                            {
+                                MessageBox.Show("Error importing file(s) ");
+                            }
+                        }
                     }
-                }
-                if ((o as FolderItem).AlbumManager.GetAlbums().Count > 0)
-                {
-                    foreach (Album album in (o as FolderItem).AlbumManager.GetAlbums())
-                    {
-                        item.Items.Add(CreateTreeItem(album));
-                    }
+                    //SerializationHelper.Serialize(albumManager);
                 }
             }
-            if (o is Album)
-            {
-                lbl.Content = (o as Album).AlbumTitle;
-                img.Source = new BitmapImage(new Uri("Assets/icons8-photo-gallery-100.png",UriKind.RelativeOrAbsolute));
-                stackPanel.Children.Add(img);
-                stackPanel.Children.Add(lbl);
 
-                item.Header = stackPanel;
-
-            }
-            item.Tag = o;
-            return item;
         }
 
-        private void ContentTreeView_Selected(object sender, RoutedEventArgs e)
-        {
-            TreeViewItem item = e.Source as TreeViewItem;
-            if(item.Tag is Album)
-            {
-                MessageBox.Show("Selected item is an Album");
-            }
-        }
+        private void ShowAlbumContent(int index)
+        {            
+            Album album= albumManager.GetAlbumAtIndex(index);
+            foreach (MediaFile mediaFile in album.MediaFiles) //check if album has files before adding to dictionary
 
-        private void NewFolder_Button_Click(object sender, RoutedEventArgs e)
-        {
-            if(ContentTreeView.SelectedItem==null)
             {
-                FolderDialog dialog = new FolderDialog();
-                dialog.ShowDialog();
-                if(dialog.DialogResult == true)
-                {
-                    folderManager.AddNewFolder(dialog.GetFolderName());
-                    LoadTreeViewItems();
-                }
-               
+                toggleHelper.Add(mediaFile, false);
             }
+                ListViewContent.ItemsSource = album.MediaFiles;
+            AlbumName_TextBlock.Text = album.AlbumTitle;
+            AlbumDescription_textBlock.Text = album.AlbumDescription;
+            
+        }
+        private void ToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+            ToggleButton toggleButton = sender as ToggleButton;
+            MediaFile mediaFile = toggleButton.DataContext as MediaFile;
+            if (toggleHelper[mediaFile])
+                toggleHelper[mediaFile] = false;
             else
-            {
-                TreeViewItem item = (TreeViewItem)ContentTreeView.SelectedItem;
-                if(item.Tag is FolderItem)
-                {
-                    FolderItem currentFolder = (FolderItem)item.Tag;
-                    FolderDialog dialog = new FolderDialog();
-                    dialog.ShowDialog();
-                    if (dialog.DialogResult == true)
-                    {
-                       
-                    }
-                }
+                toggleHelper[mediaFile] = true;
 
+        }
+        private void AlbumsTv_treeviewitem_Selected(object sender, RoutedEventArgs e)
+        {
+            int index = AlbumsTv.Items.IndexOf(AlbumsTv.SelectedItem);
+            openAlbumIndex = index;
+            ShowAlbumContent(index);
+
+            
+        }
+
+        private void Add_Button_Click(object sender, RoutedEventArgs e)
+        {
+            
+            foreach(KeyValuePair<MediaFile,bool> entry in toggleHelper)
+            {
+                if (entry.Value)
+                    slideshow.SlideshowItems.Add(new SlideshowItem(entry.Key));
             }
+            slideshow_datagrid.ItemsSource = slideshow.SlideshowItems;
+            MessageBox.Show(slideshow.SlideshowItems.Count.ToString());
+
+        }
+
+        private void Up_Button_Click(object sender, RoutedEventArgs e)
+        {
+            SlideshowItem slideshowItem = slideshow_datagrid.SelectedItem as SlideshowItem;
+            MessageBox.Show(slideshowItem.MediaFile.FileName);
         }
     }
 }

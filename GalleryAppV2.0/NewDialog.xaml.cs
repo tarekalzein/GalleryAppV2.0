@@ -13,23 +13,25 @@ using System.Windows.Shapes;
 namespace GalleryAppV2._0
 {
     /// <summary>
-    /// Interaction logic for FolderDialog.xaml
+    /// Interaction logic for NewDialog.xaml
     /// </summary>
-    public partial class FolderDialog : Window
+    public partial class NewDialog : Window
     {
-        public FolderDialog()
+        public NewDialog()
         {
             InitializeComponent();
         }
-        public FolderDialog(string oldName)
+        public NewDialog(string oldName,string oldDescription)
         {
             InitializeComponent();
-            FolderName_txtbox.Text = oldName;
+            AlbumName_txtbox.Text = oldName;
+            AlbumDescription_txtbox.Text = oldDescription;
+
         }
 
         private void Ok_Button_Click(object sender, RoutedEventArgs e)
         {
-            if(!string.IsNullOrEmpty(FolderName_txtbox.Text))
+            if(!string.IsNullOrEmpty(AlbumName_txtbox.Text))
             {
                 this.DialogResult = true;
             }
@@ -46,7 +48,14 @@ namespace GalleryAppV2._0
 
         public string GetFolderName()
         {
-            return FolderName_txtbox.Text;
+            return AlbumName_txtbox.Text;
+        }
+        public string GetFolderDescription()
+        {
+            if (!string.IsNullOrEmpty(AlbumDescription_txtbox.Text))
+                return AlbumDescription_txtbox.Text;
+            else
+                return ""; //empty description
         }
     }
 }

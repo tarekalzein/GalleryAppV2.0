@@ -4,8 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GalleryAppV2._0"
+        xmlns:self="clr-namespace:BusinessLayer;assembly=BusinessLayer"
         mc:Ignorable="d"
-        Title="Z-Gallery" Height="600" Width="800">
+        Title="Z-Gallery"
+        Height="600" Width="800">
+    <!--Height="600" Width="800"-->
+    <!--Height="{Binding SystemParameters.PrimaryScreenHeight}" Width="{Binding SystemParameters.PrimaryScreenWidth}"-->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
@@ -21,22 +25,32 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <DockPanel>
-                    <ToolBar ToolBarTray.IsLocked="True" OverflowMode="Never" Background="White" DockPanel.Dock="Top">
-                        <Button Height="25" Width="25" Click="NewFolder_Button_Click">
-                            <Image Source="toolbargraphics/icons8-add-folder-64.png"/>
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0 2">
+                        <Button Height="25" Width="25" Margin="5 0" Click="NewAlbum_Button_Click">
+                        <Image Source="toolbargraphics/icons8-photo-gallery-64.png"/>
                         </Button>
-                        <Button Height="25" Width="25">
-                            <Image Source="toolbargraphics/icons8-photo-gallery-64.png"/>
-                        </Button>
-                        <Button Height="25" Width="25">
+                        <Button Height="25" Width="25" Margin="5 0"  Click="Edit_Button_Click">
                             <Image Source="toolbargraphics/icons8-edit-64.png"/>
                         </Button>
-                        <Button Height="25" Width="25">
+                        <Button Height="25" Width="25" Margin="5 0" >
                             <Image Source="toolbargraphics/icons8-delete-64.png"/>
                         </Button>
-                    </ToolBar>
+                    </StackPanel>
+
                     <ScrollViewer HorizontalAlignment="Stretch" VerticalScrollBarVisibility="Auto" VerticalAlignment="Stretch" HorizontalScrollBarVisibility="Auto">
-                        <TreeView x:Name="ContentTreeView" TreeViewItem.Selected="ContentTreeView_Selected"/>
+                        <!--<TreeView x:Name="ContentTreeView" TreeViewItem.Selected="ContentTreeView_Selected" ItemsSource="{Binding}"/>-->
+                        <TreeView x:Name="AlbumsTv" TreeViewItem.Selected="AlbumsTv_treeviewitem_Selected">
+                            <TreeView.Resources>
+                                <HierarchicalDataTemplate DataType="{x:Type self:Album}" ItemsSource="{Binding}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="/Assets/icons8-photo-gallery-100.png" Width="16" Height="16" Margin="10 0"/>
+                                        <TextBlock Text="{Binding AlbumTitle}"/>
+                                    </StackPanel>
+
+                                </HierarchicalDataTemplate>
+                            </TreeView.Resources>
+                            
+                        </TreeView>
                     </ScrollViewer>
                 </DockPanel>
             </Grid>
@@ -44,36 +58,61 @@
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="200"/>
+                    <RowDefinition Height="150"/>
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="70"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Margin="5">
+                        <DockPanel Background="Gray">
+                            <StackPanel Margin="10 0">
+                                <TextBlock x:Name="AlbumName_TextBlock"  FontSize="24" HorizontalAlignment="Left" DockPanel.Dock="Top" Margin="0"/>
+                                <TextBlock x:Name="AlbumDescription_textBlock" Text="Create or choose an album to show its content" HorizontalAlignment="Left" DockPanel.Dock="Bottom" TextWrapping="Wrap" MaxWidth="500" />
+                            </StackPanel>
+                            <Button Content="Add images" Width="30" HorizontalAlignment="Right" DockPanel.Dock="Top" Margin="10 5" Click="import_fileDialogue_Click"/>
+                        </DockPanel>
+                    </Grid>
+                    <Grid Grid.Row="1">
                     <!--this grid contains the album content-->
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel>
+                        <StackPanel HorizontalAlignment="Center">
                             <StackPanel>
                                 <ItemsControl x:Name="ListViewContent" ItemsSource="{Binding MediaFile}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Margin="10" Width="150">
-                                                <Button x:Name="mediaFile_btn" CommandParameter="{Binding}">
-                                                    <StackPanel>
-                                                        <Border CornerRadius="5" Margin="5">
-                                                            <Border.Effect>
-                                                                <DropShadowEffect ShadowDepth="5"/>
-                                                            </Border.Effect>
-                                                        </Border>
-                                                        <TextBlock Margin="5" Text="{Binding FileName}"/>
-                                                        <TextBlock Margin="5" Text="{Binding Description}"/>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <ToggleButton CommandParameter="{Binding}" Checked="ToggleButton_Click" Unchecked="ToggleButton_Click" >
+                                                    <ToggleButton.Style>
+                                                        <Style TargetType="{x:Type ToggleButton}">
+                                                            <Setter Property="Background" Value="White"/>
+                                                            <Setter Property="BorderThickness" Value="0"/>
+                                                            <Setter Property="Margin" Value="5"/>
+                                                            <Style.Triggers>
+                                                                <Trigger Property="IsChecked" Value="True">
+                                                                    <Setter Property="Background" Value="LightCyan"/>
+                                                                </Trigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </ToggleButton.Style>
+                                                    <StackPanel Margin="10" MaxWidth="200" MaxHeight="200">
+                                                        <Image Height="150" Width="200" Source="{Binding FileThumbnail}"/>
+                                                        <TextBlock Margin="5 0" Text="{Binding FileName}" FontWeight="Bold"/>
+                                                        <TextBlock Margin="5 0" Text="{Binding Description}" TextWrapping="WrapWithOverflow"/>
                                                     </StackPanel>
-                                                </Button>
-                                            </Border>
-                                        </DataTemplate>
+                                                </ToggleButton>
+                                            </DataTemplate>
                                     </ItemsControl.ItemTemplate>
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
                                 </ItemsControl>
                             </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
-
+                    </Grid>
                 </Grid>
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
@@ -82,11 +121,26 @@
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0" HorizontalAlignment="Stretch">
                         <!--this grid contains the datagrid to create a slide show-->
-                        <DataGrid />
+                        <DataGrid x:Name="slideshow_datagrid" AutoGenerateColumns="False">
+                            <!--<DataGrid.DataContext>
+                                <self:Slideshow/>
+                            </DataGrid.DataContext>-->
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Media file name" Binding="{Binding MediaFile.FileName}"/>
+                                <DataGridTextColumn Header="Description" Binding="{Binding MediaFile.Description}" Width="*"/>
+                                <DataGridTextColumn Header="Time" Binding="{Binding Time}"/>
+                            </DataGrid.Columns>
+
+
+                        </DataGrid>
                     </Grid>
                     <Grid Grid.Column="1">
-                        <!--this grid contains the datagrid Toolbar-->
-                        <ToolBar HorizontalAlignment="Left" Height="180" VerticalAlignment="Top" Width="30"/>
+                        <StackPanel>
+                            <Button Content="+" Click="Add_Button_Click"/>
+                            <Button Content="Up" Click="Up_Button_Click"/>
+                            <Button Content="Down"/>
+                            <Button Content="-"/>
+                        </StackPanel>
                     </Grid>
                 </Grid>
             </Grid>

@@ -8,8 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\add.png" />
+    <None Remove="Assets\cog_icon.png" />
+    <None Remove="Assets\GalleryIcon.png" />
     <None Remove="Assets\icons8-folder-48.png" />
     <None Remove="Assets\icons8-photo-gallery-100.png" />
+    <None Remove="Assets\photo-gallery.png" />
+    <None Remove="Assets\plus.png" />
+    <None Remove="Assets\test_image.jpg" />
+    <None Remove="Assets\video_icon.png" />
     <None Remove="toolbargraphics\icons8-add-folder-64.png" />
     <None Remove="toolbargraphics\icons8-delete-64.png" />
     <None Remove="toolbargraphics\icons8-edit-64.png" />
@@ -22,8 +29,33 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\icons8-folder-48.png" />
-    <Resource Include="Assets\icons8-photo-gallery-100.png" />
+    <Resource Include="Assets\add.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\cog_icon.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\GalleryIcon.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\icons8-folder-48.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\icons8-photo-gallery-100.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\photo-gallery.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\plus.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\test_image.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\video_icon.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="toolbargraphics\icons8-add-folder-64.png" />
     <Resource Include="toolbargraphics\icons8-delete-64.png" />
     <Resource Include="toolbargraphics\icons8-edit-64.png" />
