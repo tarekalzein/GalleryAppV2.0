@@ -26,7 +26,7 @@ namespace BusinessLayer
         public SlideshowItem(MediaFile mediaFile)
         {
             MediaFile = mediaFile;
-            Time = 0;
+            Time = 5;//Default time in sec.
         }
     }
 }

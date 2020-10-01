@@ -188,9 +188,16 @@ namespace GalleryAppV2._0
             foreach(KeyValuePair<MediaFile,bool> entry in toggleHelper)
             {
                 if (entry.Value)
+                {
                     slideshow.SlideshowItems.Add(new SlideshowItem(entry.Key));
+                }
             }
+
             slideshow_datagrid.ItemsSource = slideshow.SlideshowItems;
+
+            //To un-toggle all buttons
+            toggleHelper = toggleHelper.ToDictionary(p => p.Key, p => false); //re-set all values to false after un-toggle.
+            ListViewContent.Items.Refresh(); 
         }
 
         private void Up_Button_Click(object sender, RoutedEventArgs e)
@@ -222,6 +229,15 @@ namespace GalleryAppV2._0
                 int index = slideshow_datagrid.Items.IndexOf(slideshow_datagrid.SelectedItem);
                 slideshow.SlideshowItems.RemoveAt(index);
             }
+        }
+        private void PlaySlideshow_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if(slideshow.SlideshowItems.Count >0)
+            {
+                SlideshowWindow slideShowPlayer = new SlideshowWindow(slideshow);
+                slideShowPlayer.Show();
+            }
+
         }
     }
 }

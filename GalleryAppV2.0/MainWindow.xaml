@@ -26,13 +26,16 @@
             <Grid Grid.Column="0">
                 <DockPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0 2">
-                        <Button Height="25" Width="25" Margin="5 0" Click="NewAlbum_Button_Click">
+                        <Button Height="25" Width="25" Margin="5 0" Click="NewAlbum_Button_Click"
+                                ToolTip="Create a new album">
                         <Image Source="toolbargraphics/icons8-photo-gallery-64.png"/>
                         </Button>
-                        <Button Height="25" Width="25" Margin="5 0"  Click="EditAlbum_Button_Click">
+                        <Button Height="25" Width="25" Margin="5 0"  Click="EditAlbum_Button_Click"
+                                ToolTip="Edit the selected album">
                             <Image Source="toolbargraphics/icons8-edit-64.png"/>
                         </Button>
-                        <Button Height="25" Width="25" Margin="5 0" Click="RemoveAlbum_Button_Click">
+                        <Button Height="25" Width="25" Margin="5 0" Click="RemoveAlbum_Button_Click"
+                                ToolTip="Remove the selected album">
                             <Image Source="toolbargraphics/icons8-delete-64.png"/>
                         </Button>
                     </StackPanel>
@@ -71,7 +74,8 @@
                                 <TextBlock x:Name="AlbumName_TextBlock"  FontSize="24" HorizontalAlignment="Left" DockPanel.Dock="Top" Margin="0"/>
                                 <TextBlock x:Name="AlbumDescription_textBlock" Text="Create or choose an album to show its content" HorizontalAlignment="Left" DockPanel.Dock="Bottom" TextWrapping="Wrap" MaxWidth="500" />
                             </StackPanel>
-                            <Button Content="Add images" Width="30" HorizontalAlignment="Right" DockPanel.Dock="Top" Margin="10 5" Click="import_fileDialogue_Click"/>
+                            <Button Content="Add images" Width="30" HorizontalAlignment="Right" DockPanel.Dock="Top" Margin="10 5" Click="import_fileDialogue_Click"
+                                    ToolTip="Import new media files to the current album"/>
                         </DockPanel>
                     </Grid>
                     <Grid Grid.Row="1">
@@ -121,7 +125,7 @@
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0" HorizontalAlignment="Stretch">
                         <!--this grid contains the datagrid to create a slide show-->
-                        <DataGrid x:Name="slideshow_datagrid" AutoGenerateColumns="False">
+                        <DataGrid x:Name="slideshow_datagrid" AutoGenerateColumns="False" CanUserAddRows="False">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Media file name" Binding="{Binding MediaFile.FileName}"/>
                                 <DataGridTextColumn Header="Description" Binding="{Binding MediaFile.Description}" Width="*"/>
@@ -131,10 +135,13 @@
                     </Grid>
                     <Grid Grid.Column="1">
                         <StackPanel>
-                            <Button Content="+" Click="Add_Button_Click"/>
-                            <Button Content="Up" Click="Up_Button_Click"/>
-                            <Button Content="Down" Click="Down_Button_Click"/>
-                            <Button Content="-" Click="Remove_from_Grid_Button_Click"/>
+                            <Button Content="Play" Click="PlaySlideshow_Button_Click"/>
+                            <Button Content="+" Click="Add_Button_Click"
+                                    ToolTip="Add selected media files to the slideshow"/>
+                            <Button Content="5" FontFamily="Marlett" Click="Up_Button_Click"/>
+                            <Button Content="6" FontFamily="Marlett" Click="Down_Button_Click"/>
+                            <Button Content="-" Click="Remove_from_Grid_Button_Click"
+                                    ToolTip="Remove the selected media file from the slide show"/>
                         </StackPanel>
                     </Grid>
                 </Grid>
