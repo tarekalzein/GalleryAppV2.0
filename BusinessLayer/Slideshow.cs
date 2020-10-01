@@ -11,7 +11,6 @@ namespace BusinessLayer
         public Slideshow()
         {
             SlideshowItems = new ObservableCollection<SlideshowItem>();
-            //SlideshowItems.Add(new SlideshowItem(new ImageFile("iamge 1", "this is an image description", "Assets/test_image.jpg")));
         }
     }
 

@@ -29,10 +29,10 @@
                         <Button Height="25" Width="25" Margin="5 0" Click="NewAlbum_Button_Click">
                         <Image Source="toolbargraphics/icons8-photo-gallery-64.png"/>
                         </Button>
-                        <Button Height="25" Width="25" Margin="5 0"  Click="Edit_Button_Click">
+                        <Button Height="25" Width="25" Margin="5 0"  Click="EditAlbum_Button_Click">
                             <Image Source="toolbargraphics/icons8-edit-64.png"/>
                         </Button>
-                        <Button Height="25" Width="25" Margin="5 0" >
+                        <Button Height="25" Width="25" Margin="5 0" Click="RemoveAlbum_Button_Click">
                             <Image Source="toolbargraphics/icons8-delete-64.png"/>
                         </Button>
                     </StackPanel>
@@ -122,24 +122,19 @@
                     <Grid Grid.Column="0" HorizontalAlignment="Stretch">
                         <!--this grid contains the datagrid to create a slide show-->
                         <DataGrid x:Name="slideshow_datagrid" AutoGenerateColumns="False">
-                            <!--<DataGrid.DataContext>
-                                <self:Slideshow/>
-                            </DataGrid.DataContext>-->
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Media file name" Binding="{Binding MediaFile.FileName}"/>
                                 <DataGridTextColumn Header="Description" Binding="{Binding MediaFile.Description}" Width="*"/>
                                 <DataGridTextColumn Header="Time" Binding="{Binding Time}"/>
                             </DataGrid.Columns>
-
-
                         </DataGrid>
                     </Grid>
                     <Grid Grid.Column="1">
                         <StackPanel>
                             <Button Content="+" Click="Add_Button_Click"/>
                             <Button Content="Up" Click="Up_Button_Click"/>
-                            <Button Content="Down"/>
-                            <Button Content="-"/>
+                            <Button Content="Down" Click="Down_Button_Click"/>
+                            <Button Content="-" Click="Remove_from_Grid_Button_Click"/>
                         </StackPanel>
                     </Grid>
                 </Grid>

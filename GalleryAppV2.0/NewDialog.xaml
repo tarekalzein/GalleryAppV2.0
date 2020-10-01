@@ -15,13 +15,13 @@
         <Grid Grid.Row="0">
             <DockPanel>
                 <Label Content="Title:" VerticalAlignment="Center" FontWeight="Bold" />
-                <TextBox x:Name="AlbumName_txtbox" TextWrapping="Wrap" Width="220"  Height="33" MaxLength="30" HorizontalAlignment="Right"/>
+                <TextBox x:Name="AlbumName_txtbox" TextWrapping="Wrap" Width="220"  Height="30" MaxLength="30" HorizontalAlignment="Right" VerticalContentAlignment="Center" FontSize="14" />
             </DockPanel>
         </Grid>
         <Grid Grid.Row="1">
             <DockPanel>
                 <Label Content="Description:" FontWeight="Bold" HorizontalAlignment="Left" />
-                <TextBox x:Name="AlbumDescription_txtbox" TextWrapping="Wrap" Width="220"  Height="50" MaxLength="150" HorizontalAlignment="Right"/>
+                <TextBox x:Name="AlbumDescription_txtbox" TextWrapping="Wrap" Width="220"  Height="50" MaxLength="150" HorizontalAlignment="Right" FontSize="14"/>
             </DockPanel>
         </Grid>
         <Grid Grid.Row="2" HorizontalAlignment="Right">

@@ -58,5 +58,14 @@ namespace BusinessLayer
         {
             return albumList.Count;
         }
+
+        public void EditAlbumAtIndex(int index,string newTitle, string newDescription)
+        {
+            if(!string.IsNullOrEmpty(newTitle))
+            {
+                albumList[index].AlbumTitle = newTitle;
+                albumList[index].AlbumDescription = newDescription;
+            }
+        }
     }
 }

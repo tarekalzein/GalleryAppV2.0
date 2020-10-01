@@ -46,11 +46,11 @@ namespace GalleryAppV2._0
             this.DialogResult = false;
         }
 
-        public string GetFolderName()
+        public string GetAlbumName()
         {
             return AlbumName_txtbox.Text;
         }
-        public string GetFolderDescription()
+        public string GetAlbumDescription()
         {
             if (!string.IsNullOrEmpty(AlbumDescription_txtbox.Text))
                 return AlbumDescription_txtbox.Text;

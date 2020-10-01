@@ -19,8 +19,8 @@ namespace GalleryAppV2._0
     {
         AlbumManager albumManager = new AlbumManager();
         private int openAlbumIndex= -1;
-        private Dictionary<MediaFile, bool> toggleHelper = new Dictionary<MediaFile, bool>();
-        private Slideshow slideshow = new Slideshow();
+        private Dictionary<MediaFile, bool> toggleHelper = new Dictionary<MediaFile, bool>(); //Helper dictionary to add toggle property/state for a media file toggle button.
+        private Slideshow slideshow;
 
 
         public MainWindow()
@@ -34,8 +34,6 @@ namespace GalleryAppV2._0
         {
             AlbumsTv.ItemsSource = albumManager.GetAlbums();
             slideshow_datagrid.ItemsSource = slideshow.SlideshowItems;
-            slideshow = new Slideshow();
-
         }
 
         private void NewAlbum_Button_Click(object sender, RoutedEventArgs e)
@@ -44,14 +42,37 @@ namespace GalleryAppV2._0
             dialog.ShowDialog();
             if (dialog.DialogResult == true)
             {
-                albumManager.AddNewAlbum(new Album(dialog.GetFolderName(), dialog.GetFolderDescription()));
+                albumManager.AddNewAlbum(new Album(dialog.GetAlbumName(), dialog.GetAlbumDescription()));
             }
         }
 
-        private void Edit_Button_Click(object sender, RoutedEventArgs e)
+        private void EditAlbum_Button_Click(object sender, RoutedEventArgs e)
         {
-            int index= AlbumsTv.Items.IndexOf(AlbumsTv.SelectedItem);
-            MessageBox.Show(index.ToString());            
+            if(AlbumsTv.SelectedItem!=null)
+            {
+                int index = AlbumsTv.Items.IndexOf(AlbumsTv.SelectedItem);
+
+                Album album = albumManager.GetAlbumAtIndex(index);
+
+                NewDialog dialog = new NewDialog(album.AlbumTitle, album.AlbumDescription);
+                dialog.ShowDialog();
+                if (dialog.DialogResult == true)
+                {
+                    album.AlbumTitle = dialog.GetAlbumName();
+                    album.AlbumDescription = dialog.GetAlbumDescription();
+
+                    AlbumsTv.Items.Refresh(); //called because observablecollection will notify only when adding/deleting item from list, but not when changing an item's detail.
+                }
+            }
+        }
+
+        private void RemoveAlbum_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if(AlbumsTv.SelectedItem!=null)
+            {
+                int index = AlbumsTv.Items.IndexOf(AlbumsTv.SelectedItem);
+                albumManager.RemoveAlbum(index);
+            }
         }
 
         private void import_fileDialogue_Click(object sender, RoutedEventArgs e)
@@ -102,15 +123,22 @@ namespace GalleryAppV2._0
                         {
                             try
                             {
+                                MediaFile file;
                                 switch (extension)
                                 {
                                     case ".jpg":
                                     case ".png":
-                                        album.MediaFiles.Add(new ImageFile(fileName, "", filePath));
+                                        //album.MediaFiles.Add(new ImageFile(fileName, "", filePath));
+                                         file = new ImageFile(fileName, "", filePath);
+                                        album.MediaFiles.Add(file);
+                                        toggleHelper.Add(file, false);
                                         break;
                                     case ".wmv":
                                     case ".mp4":
-                                        album.MediaFiles.Add(new VideoFile(fileName, "", filePath));
+                                        //album.MediaFiles.Add(new VideoFile(fileName, "", filePath));
+                                        file = new VideoFile(fileName, "", filePath);
+                                        album.MediaFiles.Add(file);
+                                        toggleHelper.Add(file, false);
                                         break;
                                 }
                             }
@@ -123,18 +151,17 @@ namespace GalleryAppV2._0
                     //SerializationHelper.Serialize(albumManager);
                 }
             }
-
         }
 
         private void ShowAlbumContent(int index)
         {            
             Album album= albumManager.GetAlbumAtIndex(index);
+            toggleHelper.Clear();
             foreach (MediaFile mediaFile in album.MediaFiles) //check if album has files before adding to dictionary
-
             {
-                toggleHelper.Add(mediaFile, false);
+                    toggleHelper.Add(mediaFile, false);
             }
-                ListViewContent.ItemsSource = album.MediaFiles;
+            ListViewContent.ItemsSource = album.MediaFiles;
             AlbumName_TextBlock.Text = album.AlbumTitle;
             AlbumDescription_textBlock.Text = album.AlbumDescription;
             
@@ -147,15 +174,12 @@ namespace GalleryAppV2._0
                 toggleHelper[mediaFile] = false;
             else
                 toggleHelper[mediaFile] = true;
-
         }
         private void AlbumsTv_treeviewitem_Selected(object sender, RoutedEventArgs e)
         {
             int index = AlbumsTv.Items.IndexOf(AlbumsTv.SelectedItem);
             openAlbumIndex = index;
-            ShowAlbumContent(index);
-
-            
+            ShowAlbumContent(index);            
         }
 
         private void Add_Button_Click(object sender, RoutedEventArgs e)
@@ -167,14 +191,37 @@ namespace GalleryAppV2._0
                     slideshow.SlideshowItems.Add(new SlideshowItem(entry.Key));
             }
             slideshow_datagrid.ItemsSource = slideshow.SlideshowItems;
-            MessageBox.Show(slideshow.SlideshowItems.Count.ToString());
-
         }
 
         private void Up_Button_Click(object sender, RoutedEventArgs e)
         {
-            SlideshowItem slideshowItem = slideshow_datagrid.SelectedItem as SlideshowItem;
-            MessageBox.Show(slideshowItem.MediaFile.FileName);
+            if (slideshow_datagrid.SelectedItem != null)
+            {
+                int index = slideshow_datagrid.Items.IndexOf(slideshow_datagrid.SelectedItem);
+                if(index!=0)
+                {
+                    slideshow.SlideshowItems.Move(index, index - 1);
+                }
+            }
+        }
+
+        private void Down_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (slideshow_datagrid.SelectedItem != null)
+            {
+                int index = slideshow_datagrid.Items.IndexOf(slideshow_datagrid.SelectedItem);
+                if (index + 1 != slideshow.SlideshowItems.Count)
+                    slideshow.SlideshowItems.Move(index, index + 1);
+
+            }
+        }
+        private void Remove_from_Grid_Button_Click( object sender, RoutedEventArgs e)
+        {
+            if(slideshow_datagrid.SelectedItem!=null)
+            {
+                int index = slideshow_datagrid.Items.IndexOf(slideshow_datagrid.SelectedItem);
+                slideshow.SlideshowItems.RemoveAt(index);
+            }
         }
     }
 }
