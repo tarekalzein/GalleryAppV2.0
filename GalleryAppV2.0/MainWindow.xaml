@@ -127,9 +127,9 @@
                         <!--this grid contains the datagrid to create a slide show-->
                         <DataGrid x:Name="slideshow_datagrid" AutoGenerateColumns="False" CanUserAddRows="False">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Media file name" Binding="{Binding MediaFile.FileName}"/>
+                                <DataGridTextColumn Header="File name" Binding="{Binding MediaFile.FileName}"/>
                                 <DataGridTextColumn Header="Description" Binding="{Binding MediaFile.Description}" Width="*"/>
-                                <DataGridTextColumn Header="Time" Binding="{Binding Time}"/>
+                                <DataGridTextColumn Header="Time in sec" Binding="{Binding Time}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>

@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media.Imaging;
 using BusinessLayer;
+using DataAccess;
 using Microsoft.Win32;
 
 namespace GalleryAppV2._0
@@ -17,7 +18,9 @@ namespace GalleryAppV2._0
     /// </summary>
     public partial class MainWindow : Window
     {
-        AlbumManager albumManager = new AlbumManager();
+        //AlbumManager albumManager = new AlbumManager();
+        AlbumManager albumManager ;
+
         private int openAlbumIndex= -1;
         private Dictionary<MediaFile, bool> toggleHelper = new Dictionary<MediaFile, bool>(); //Helper dictionary to add toggle property/state for a media file toggle button.
         private Slideshow slideshow;
@@ -26,12 +29,21 @@ namespace GalleryAppV2._0
         public MainWindow()
         {
             InitializeComponent();
-            slideshow = new Slideshow();
-            InitializeGUI();
+
+            MyInitialization();
         }
 
-        private void InitializeGUI()
+        private void MyInitialization()
         {
+            string errorMessage;
+            albumManager = SerializationHelper.Deserialize(out errorMessage);
+            if(!string.IsNullOrEmpty(errorMessage))
+            {
+                MessageBox.Show(errorMessage);
+            }
+
+            slideshow = new Slideshow();
+
             AlbumsTv.ItemsSource = albumManager.GetAlbums();
             slideshow_datagrid.ItemsSource = slideshow.SlideshowItems;
         }
@@ -43,6 +55,7 @@ namespace GalleryAppV2._0
             if (dialog.DialogResult == true)
             {
                 albumManager.AddNewAlbum(new Album(dialog.GetAlbumName(), dialog.GetAlbumDescription()));
+                SerializationHelper.Serialize(albumManager);
             }
         }
 
@@ -62,6 +75,7 @@ namespace GalleryAppV2._0
                     album.AlbumDescription = dialog.GetAlbumDescription();
 
                     AlbumsTv.Items.Refresh(); //called because observablecollection will notify only when adding/deleting item from list, but not when changing an item's detail.
+                    SerializationHelper.Serialize(albumManager);
                 }
             }
         }
@@ -72,6 +86,7 @@ namespace GalleryAppV2._0
             {
                 int index = AlbumsTv.Items.IndexOf(AlbumsTv.SelectedItem);
                 albumManager.RemoveAlbum(index);
+                SerializationHelper.Serialize(albumManager);
             }
         }
 
@@ -148,7 +163,7 @@ namespace GalleryAppV2._0
                             }
                         }
                     }
-                    //SerializationHelper.Serialize(albumManager);
+                    SerializationHelper.Serialize(albumManager);
                 }
             }
         }
@@ -159,7 +174,7 @@ namespace GalleryAppV2._0
             toggleHelper.Clear();
             foreach (MediaFile mediaFile in album.MediaFiles) //check if album has files before adding to dictionary
             {
-                    toggleHelper.Add(mediaFile, false);
+                toggleHelper.Add(mediaFile, false);
             }
             ListViewContent.ItemsSource = album.MediaFiles;
             AlbumName_TextBlock.Text = album.AlbumTitle;
@@ -183,8 +198,7 @@ namespace GalleryAppV2._0
         }
 
         private void Add_Button_Click(object sender, RoutedEventArgs e)
-        {
-            
+        {            
             foreach(KeyValuePair<MediaFile,bool> entry in toggleHelper)
             {
                 if (entry.Value)
@@ -219,7 +233,6 @@ namespace GalleryAppV2._0
                 int index = slideshow_datagrid.Items.IndexOf(slideshow_datagrid.SelectedItem);
                 if (index + 1 != slideshow.SlideshowItems.Count)
                     slideshow.SlideshowItems.Move(index, index + 1);
-
             }
         }
         private void Remove_from_Grid_Button_Click( object sender, RoutedEventArgs e)
@@ -237,7 +250,6 @@ namespace GalleryAppV2._0
                 SlideshowWindow slideShowPlayer = new SlideshowWindow(slideshow);
                 slideShowPlayer.Show();
             }
-
         }
     }
 }
