@@ -27,7 +27,6 @@
         </Style>
     </Window.Resources>
 
-
     <Grid>
         <Frame x:Name="SlideshowFrame" NavigationUIVisibility="Hidden"/>
         <Grid HorizontalAlignment="Left">

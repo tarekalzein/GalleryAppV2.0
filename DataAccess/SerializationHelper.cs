@@ -58,7 +58,14 @@ namespace DataAccess
                     BinaryFormatter b = new BinaryFormatter();
                     if(new FileInfo(targetFile).Length>0)
                     {
-                        albumManager = (AlbumManager)b.Deserialize(fileStream);
+                        try
+                        {
+                            albumManager = (AlbumManager)b.Deserialize(fileStream);
+                        }
+                        catch(System.Text.DecoderFallbackException e)
+                        {
+                            errorMessage = "Error in decoding the saved data. File is corrupt. \n" +e.Message;
+                        }
                     }
                 }
             }

@@ -5,6 +5,10 @@ using System.Text;
 
 namespace BusinessLayer
 {
+    /// <summary>
+    /// This Class is not implemented yet.
+    /// Todo: implement adding new folders in the treeview with Hierarchial data structure.
+    /// </summary>
     public class FolderItem
     {
         public string FolderName { get; set; }

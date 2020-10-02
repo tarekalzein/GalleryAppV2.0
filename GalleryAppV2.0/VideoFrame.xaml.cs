@@ -21,7 +21,6 @@ namespace GalleryAppV2._0
         MediaPlayer mediaPlayer;
         public delegate void VideoEventHandler(object source, EventArgs args);
         public event VideoEventHandler VideoPlayFinished;
-
         public VideoFrame(string videoPath)
         {
             InitializeComponent();

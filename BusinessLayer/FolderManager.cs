@@ -5,6 +5,9 @@ using System.Text;
 
 namespace BusinessLayer
 {
+    /// <summary>
+    /// Not implemented yet. It will allow the user to organize the albums in folders and subfolders.
+    /// </summary>
     public class FolderManager
     {
         ObservableCollection<FolderItem> applicationFolders;

@@ -8,8 +8,6 @@ namespace BusinessLayer
     [Serializable]
     public class AlbumManager
     {
-
-        //Changed to ObservableCollection to eliminate the need to update ListViews.
         ObservableCollection<Album> albumList = new ObservableCollection<Album>();
         /// <summary>
         /// Empty constructor to be used with serialization.
@@ -52,20 +50,15 @@ namespace BusinessLayer
         /// <returns>Instance of Album</returns>
         public Album GetAlbumAtIndex(int index)
         {
-            return albumList[index];
+                return albumList[index];
         }
+        /// <summary>
+        /// Method to retrieve the count of media files in an album.
+        /// </summary>
+        /// <returns></returns>
         public int Count()
         {
             return albumList.Count;
-        }
-
-        public void EditAlbumAtIndex(int index,string newTitle, string newDescription)
-        {
-            if(!string.IsNullOrEmpty(newTitle))
-            {
-                albumList[index].AlbumTitle = newTitle;
-                albumList[index].AlbumDescription = newDescription;
-            }
         }
     }
 }

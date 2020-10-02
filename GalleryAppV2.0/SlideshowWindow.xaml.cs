@@ -35,10 +35,7 @@ namespace GalleryAppV2._0
                 currentIndex = 0;
                 ShowMediaFileAtIndex(currentIndex);
             }
-
-
         }
-
         /// <summary>
         /// Method to send the media file to the appropriate page and subscribe to their events.
         /// </summary>
@@ -61,13 +58,22 @@ namespace GalleryAppV2._0
                     SlideshowFrame.Content = videoFrame;
                 }
             }
-
         }
+        /// <summary>
+        /// Method to call when subscriber gets notified about end of image play.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="args"></param>
         private void OnImagePlayFinished(object source, EventArgs args)
         {
             if (slideshow.SlideshowItems[currentIndex].MediaFile is ImageFile)
                 PlayNext();
         }
+        /// <summary>
+        /// Method to call when subscriber gets notified about end of video
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="args"></param>
         private void OnVideoPlayFinished(object source, EventArgs args)
         {
             PlayNext();
@@ -77,7 +83,11 @@ namespace GalleryAppV2._0
         {
             PlayNext();
         }
-
+        /// <summary>
+        /// Method to play previous media file in the slideshow.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void previous_btn_Click(object sender, RoutedEventArgs e)
         {
             if(currentIndex !=0)
@@ -86,6 +96,9 @@ namespace GalleryAppV2._0
                 ShowMediaFileAtIndex(currentIndex);
             }
         }
+        /// <summary>
+        /// Method to play next media file in the slideshow.
+        /// </summary>
         private void PlayNext()
         {
             if (imageFrame != null)
