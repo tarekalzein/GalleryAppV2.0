@@ -141,6 +141,7 @@ namespace GalleryAppV2._0
                             MessageBoxResult result = MessageBox.Show($"{fileName} already exists in this album, would you like to add it anyway?",
                                     "File already exists",
                                     MessageBoxButton.YesNo);
+                            MediaFile file;
                             switch (result)
                             {
                                 case MessageBoxResult.Yes:
@@ -148,12 +149,14 @@ namespace GalleryAppV2._0
                                     {
                                         case ".jpg":
                                         case ".png":
-                                            album.MediaFiles.Add(new ImageFile(fileName, "", filePath));
-                                            break;
+                                            file = new ImageFile(fileName, "", filePath);
+                                            album.MediaFiles.Add(file);
+                                            toggleHelper.Add(file, false); break;
                                         case ".wmv":
                                         case ".mp4":
-                                            album.MediaFiles.Add(new VideoFile(fileName, "", filePath));
-                                            break;
+                                            file = new VideoFile(fileName, "", filePath);
+                                            album.MediaFiles.Add(file);
+                                            toggleHelper.Add(file, false); break;
                                     }
                                     break;
                                 case MessageBoxResult.No:
