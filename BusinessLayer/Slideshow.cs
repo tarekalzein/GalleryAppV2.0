@@ -17,6 +17,7 @@ namespace BusinessLayer
         public Slideshow()
         {
             SlideshowItems = new ObservableCollection<SlideshowItem>();
+
         }
     }
     /// <summary>
@@ -27,10 +28,19 @@ namespace BusinessLayer
         public MediaFile MediaFile { get; set; }
         public int Time { get; set; }
 
+        public FileTypes FileType { get; set; }
+
         public SlideshowItem(MediaFile mediaFile)
         {
             MediaFile = mediaFile;
             Time = 5;//Default time in sec.
+            FileType = (mediaFile is ImageFile) ? FileTypes.Image : FileTypes.Video;
         }
+    }
+
+    public enum FileTypes
+    {
+        Image,
+        Video
     }
 }

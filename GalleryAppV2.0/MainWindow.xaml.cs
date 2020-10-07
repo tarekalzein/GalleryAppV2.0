@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using BusinessLayer;
+using DataAccess;
+using Microsoft.Win32;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Media.Imaging;
-using BusinessLayer;
-using DataAccess;
-using Microsoft.Win32;
 
 namespace GalleryAppV2._0
 {
@@ -17,21 +12,16 @@ namespace GalleryAppV2._0
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
-    {
-        //AlbumManager albumManager = new AlbumManager();
+    {      
         AlbumManager albumManager ;
-
         private int openAlbumIndex= -1;
-        private Dictionary<MediaFile, bool> toggleHelper = new Dictionary<MediaFile, bool>(); //Helper dictionary to add toggle property/state for a media file toggle button.
-        private Slideshow slideshow;
-
 
         public MainWindow()
         {
             InitializeComponent();
-
             MyInitialization();
         }
+
         /// <summary>
         /// Method to finish initialization of the application..
         /// In this step: desrialization of the saved data (from data.bin) if it exists.
@@ -47,11 +37,9 @@ namespace GalleryAppV2._0
                 MessageBox.Show(errorMessage);
             }
 
-            slideshow = new Slideshow();
-
             AlbumsTv.ItemsSource = albumManager.GetAlbums();
-            slideshow_datagrid.ItemsSource = slideshow.SlideshowItems;
         }
+
         /// <summary>
         /// New Album Button Action. Opens the New Album Dialogue, receives the album title and description from the user
         /// Then uses them to create a new Album instance. Saves changes in data.bin with serialization.
@@ -93,6 +81,7 @@ namespace GalleryAppV2._0
                 }
             }
         }
+
         /// <summary>
         /// Action Method to remove an item, album, from the album manager instance.
         /// </summary>
@@ -106,11 +95,13 @@ namespace GalleryAppV2._0
                 albumManager.RemoveAlbum(index);
                 SerializationHelper.Serialize(albumManager);
 
+                //TODO: When deleting all albums in treeview, last album's details are still visible: this must be fixed
                 //ListViewContent.ItemsSource = new Album().MediaFiles; //Clear the ListViewContent
                 //AlbumName_TextBlock.Text = "";
                 //AlbumDescription_textBlock.Text = "Create or choose an album to show its content";
             }
         }
+
         /// <summary>
         /// Action method for adding new media files to an album.
         /// </summary>
@@ -118,8 +109,9 @@ namespace GalleryAppV2._0
         /// <param name="e"></param>
         private void import_fileDialogue_Click(object sender, RoutedEventArgs e)
         {
+            //TODO: add method to prevent Duplication in code (DRY)
             //Check if an album is already open or not.
-            if(openAlbumIndex!=-1 && openAlbumIndex <albumManager.Count())
+            if (openAlbumIndex != -1 && openAlbumIndex < albumManager.Count())
             {
                 Album album = albumManager.GetAlbumAtIndex(openAlbumIndex);
                 OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -151,12 +143,12 @@ namespace GalleryAppV2._0
                                         case ".png":
                                             file = new ImageFile(fileName, "", filePath);
                                             album.MediaFiles.Add(file);
-                                            toggleHelper.Add(file, false); break;
+                                            break;
                                         case ".wmv":
                                         case ".mp4":
                                             file = new VideoFile(fileName, "", filePath);
                                             album.MediaFiles.Add(file);
-                                            toggleHelper.Add(file, false); break;
+                                            break;
                                     }
                                     break;
                                 case MessageBoxResult.No:
@@ -174,16 +166,14 @@ namespace GalleryAppV2._0
                                     case ".jpg":
                                     case ".png":
                                         //album.MediaFiles.Add(new ImageFile(fileName, "", filePath));
-                                         file = new ImageFile(fileName, "", filePath);
+                                        file = new ImageFile(fileName, "", filePath);
                                         album.MediaFiles.Add(file);
-                                        toggleHelper.Add(file, false);
                                         break;
                                     case ".wmv":
                                     case ".mp4":
                                         //album.MediaFiles.Add(new VideoFile(fileName, "", filePath));
                                         file = new VideoFile(fileName, "", filePath);
                                         album.MediaFiles.Add(file);
-                                        toggleHelper.Add(file, false);
                                         break;
                                 }
                             }
@@ -197,38 +187,19 @@ namespace GalleryAppV2._0
                 }
             }
         }
+
         /// <summary>
-        /// Method that imports all content from an album in the album manager instance.
-        /// Adds the album content to a dictionary to add a toggle property (bool) to be used later in selecting the files.
+        /// Method that imports all content from an album in the album manager instance and pop it to the album_datagrid.
         /// </summary>
         /// <param name="index"></param>
         private void ShowAlbumContent(int index)
         {            
             Album album= albumManager.GetAlbumAtIndex(index);
-            toggleHelper.Clear();
-            foreach (MediaFile mediaFile in album.MediaFiles) //check if album has files before adding to dictionary
-            {
-                toggleHelper.Add(mediaFile, false);
-            }
-
-            ListViewContent.ItemsSource = album.MediaFiles;
+            album_datagrid.ItemsSource = album.MediaFiles;
             AlbumName_TextBlock.Text = album.AlbumTitle;
-            AlbumDescription_textBlock.Text = album.AlbumDescription;            
+            AlbumDescription_textBlock.Text = album.AlbumDescription;
         }
-        /// <summary>
-        /// Method to call when toggle event is raised. It switches between the toggle button state. (of the media file).
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ToggleButton_Click(object sender, RoutedEventArgs e)
-        {
-            ToggleButton toggleButton = sender as ToggleButton;
-            MediaFile mediaFile = toggleButton.DataContext as MediaFile;
-            if (toggleHelper[mediaFile])
-                toggleHelper[mediaFile] = false;
-            else
-                toggleHelper[mediaFile] = true;
-        }
+ 
         /// <summary>
         /// Method to call when a user chooses an album from the treeview to show its content in the ListViewContent.
         /// </summary>
@@ -240,43 +211,25 @@ namespace GalleryAppV2._0
             openAlbumIndex = index;
             ShowAlbumContent(index);
         }
-        /// <summary>
-        /// Action method to add the selected (toggled) media files to the slideshow instance.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Add_Button_Click(object sender, RoutedEventArgs e)
-        {            
-            foreach(KeyValuePair<MediaFile,bool> entry in toggleHelper)
-            {
-                if (entry.Value)
-                {
-                    slideshow.SlideshowItems.Add(new SlideshowItem(entry.Key));
-                }
-            }
 
-            slideshow_datagrid.ItemsSource = slideshow.SlideshowItems;
-
-            //To un-toggle all buttons after adding items to the slideshow.
-            toggleHelper = toggleHelper.ToDictionary(p => p.Key, p => false); //re-set all values to false after un-toggle.
-            ListViewContent.Items.Refresh(); 
-        }
-        /// <summary>
+        ///// <summary>
         /// Method to move an item in the slideshow list (one row up at a time).
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void Up_Button_Click(object sender, RoutedEventArgs e)
         {
-            if (slideshow_datagrid.SelectedItem != null)
+            if (album_datagrid.SelectedItem != null)
             {
-                int index = slideshow_datagrid.Items.IndexOf(slideshow_datagrid.SelectedItem);
+                int index = album_datagrid.Items.IndexOf(album_datagrid.SelectedItem);
+                Album album = albumManager.GetAlbumAtIndex(openAlbumIndex);
                 if(index!=0)
                 {
-                    slideshow.SlideshowItems.Move(index, index - 1);
+                    album.MediaFiles.Move(index, index - 1);
                 }
             }
         }
+
         /// <summary>
         /// Method to move an item in the slideshow list (one row down at a time).
         /// </summary>
@@ -284,13 +237,16 @@ namespace GalleryAppV2._0
         /// <param name="e"></param>
         private void Down_Button_Click(object sender, RoutedEventArgs e)
         {
-            if (slideshow_datagrid.SelectedItem != null)
+            if (album_datagrid.SelectedItem != null)
             {
-                int index = slideshow_datagrid.Items.IndexOf(slideshow_datagrid.SelectedItem);
-                if (index + 1 != slideshow.SlideshowItems.Count)
-                    slideshow.SlideshowItems.Move(index, index + 1);
+                int index = album_datagrid.Items.IndexOf(album_datagrid.SelectedItem);
+                Album album = albumManager.GetAlbumAtIndex(openAlbumIndex);
+
+                if (index + 1 != album.MediaFiles.Count)
+                    album.MediaFiles.Move(index, index + 1);
             }
         }
+
         /// <summary>
         /// Method to remove a row (slideshow item) from the data grid.
         /// </summary>
@@ -298,12 +254,13 @@ namespace GalleryAppV2._0
         /// <param name="e"></param>
         private void Remove_from_Grid_Button_Click( object sender, RoutedEventArgs e)
         {
-            if(slideshow_datagrid.SelectedItem!=null)
+            if(album_datagrid.SelectedItem!=null)
             {
-                int index = slideshow_datagrid.Items.IndexOf(slideshow_datagrid.SelectedItem);
-                slideshow.SlideshowItems.RemoveAt(index);
+                int index = album_datagrid.Items.IndexOf(album_datagrid.SelectedItem);
+                albumManager.GetAlbumAtIndex(openAlbumIndex).MediaFiles.RemoveAt(index);
             }
         }
+
         /// <summary>
         /// Method to show the slideshow content in a slideshow window (fullscreen with autoplay).
         /// </summary>
@@ -311,11 +268,24 @@ namespace GalleryAppV2._0
         /// <param name="e"></param>
         private void PlaySlideshow_Button_Click(object sender, RoutedEventArgs e)
         {
-            if(slideshow.SlideshowItems.Count >0)
+            Album album = albumManager.GetAlbumAtIndex(openAlbumIndex);
+            if (album.MediaFiles.Count >0)
             {
-                SlideshowWindow slideShowPlayer = new SlideshowWindow(slideshow);
-                slideShowPlayer.Show();
+                int currentSlideshowIndex = 0;
+
             }
+
+        }
+
+        private void Play_Selected_Item_Click(object sender, RoutedEventArgs e)
+        {
+            int index = album_datagrid.Items.IndexOf(album_datagrid.SelectedItem);
+            //Process.Start(albumManager.GetAlbumAtIndex(openAlbumIndex).MediaFiles[index].FilePath); //I don't know why it throws win32 exception
+            var psi = new ProcessStartInfo() {
+                FileName = albumManager.GetAlbumAtIndex(openAlbumIndex).MediaFiles[index].FilePath,
+                UseShellExecute = true 
+            };
+            Process.Start(psi);
         }
     }
 }
