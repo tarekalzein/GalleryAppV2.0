@@ -316,13 +316,11 @@ namespace GalleryAppV2._0
                         SlideshowFrame.Content = videoFrame;
                     }
                 }
-                else { PlayNext(); }
-                
+                else { PlayNext(); }                
             }
         }
         private void OnImagePlayFinished(object source, System.EventArgs args)
         {
-            if (albumManager.GetAlbumAtIndex(openAlbumIndex).MediaFiles[currentSlideshowIndex] is ImageFile)
                 PlayNext();
         }
         private void OnVideoPlayFinished(object source, EventArgs args)
@@ -340,8 +338,9 @@ namespace GalleryAppV2._0
                 currentSlideshowIndex++;
                 ShowMediaFileAtIndex(currentSlideshowIndex);
             }
-            if(currentSlideshowIndex + 1 == albumManager.GetAlbumAtIndex(openAlbumIndex).MediaFiles.Count)
+            else if (currentSlideshowIndex + 1 == albumManager.GetAlbumAtIndex(openAlbumIndex).MediaFiles.Count)
                 StopSlideshow();
+
         }
         private void next_btn_Click(object sender, RoutedEventArgs e)
         {
@@ -351,6 +350,11 @@ namespace GalleryAppV2._0
         {
             if (currentSlideshowIndex != 0)
             {
+                if (imageFrame != null)
+                {
+                    imageFrame.StopTimer();
+                    imageFrame = null;
+                }
                 currentSlideshowIndex--;
                 ShowMediaFileAtIndex(currentSlideshowIndex);
             }
@@ -364,10 +368,14 @@ namespace GalleryAppV2._0
         }
         private void StopSlideshow()
         {
-            imageFrame.StopTimer();
-            imageFrame = null;
+            if(imageFrame!=null)
+            {
+                imageFrame.StopTimer();
+                imageFrame = null;
+            }
             currentSlideshowIndex = 0;
             SlideshowFrame.Content = null;
+            MessageBox.Show("Slideshow finished playing");
         }
         private void Toggle_Selection(object sender, RoutedEventArgs e)
         {
