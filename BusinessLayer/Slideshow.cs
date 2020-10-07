@@ -17,7 +17,6 @@ namespace BusinessLayer
         public Slideshow()
         {
             SlideshowItems = new ObservableCollection<SlideshowItem>();
-
         }
     }
     /// <summary>

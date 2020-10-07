@@ -20,28 +20,16 @@ namespace GalleryAppV2._0
         int currentSlideshowIndex = 0;
         ImageFrame imageFrame;
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
+            
+            //Subscribe to ESC key event. Receiver ESC button press to stop playing slideshow.
             this.PreviewKeyDown += new KeyEventHandler(EscButtonHandler);
-            MyInitialization();
-        }
-
-        /// <summary>
-        /// Method to finish initialization of the application..
-        /// In this step: desrialization of the saved data (from data.bin) if it exists.
-        /// </summary>
-        private void MyInitialization()
-        {
-            string errorMessage;
-
-            //Import saved data from Data.bin file
-            albumManager = SerializationHelper.Deserialize(out errorMessage);
-            if(!string.IsNullOrEmpty(errorMessage))
-            {
-                MessageBox.Show(errorMessage);
-            }
-
+            albumManager = new AlbumManager();
             AlbumsTv.ItemsSource = albumManager.GetAlbums();
         }
 
@@ -58,7 +46,6 @@ namespace GalleryAppV2._0
             if (dialog.DialogResult == true)
             {
                 albumManager.AddNewAlbum(new Album(dialog.GetAlbumName(), dialog.GetAlbumDescription()));
-                SerializationHelper.Serialize(albumManager);
             }
         }
         /// <summary>
@@ -82,7 +69,6 @@ namespace GalleryAppV2._0
                     album.AlbumDescription = dialog.GetAlbumDescription();
 
                     AlbumsTv.Items.Refresh(); //called because observablecollection will notify only when adding/deleting item from list, but not when changing an item's detail.
-                    SerializationHelper.Serialize(albumManager);
                 }
             }
         }
@@ -98,7 +84,6 @@ namespace GalleryAppV2._0
             {
                 int index = AlbumsTv.Items.IndexOf(AlbumsTv.SelectedItem);
                 albumManager.RemoveAlbum(index);
-                SerializationHelper.Serialize(albumManager);
 
                 //TODO: When deleting all albums in treeview, last album's details are still visible: this must be fixed
                 //ListViewContent.ItemsSource = new Album().MediaFiles; //Clear the ListViewContent
@@ -188,7 +173,6 @@ namespace GalleryAppV2._0
                             }
                         }
                     }
-                    SerializationHelper.Serialize(albumManager);
                 }
             }
         }
@@ -206,7 +190,7 @@ namespace GalleryAppV2._0
         }
  
         /// <summary>
-        /// Method to call when a user chooses an album from the treeview to show its content in the ListViewContent.
+        /// Method to call when a user chooses an album from the treeview to show its content in the Album Datagrid.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -285,6 +269,11 @@ namespace GalleryAppV2._0
             }            
         }
 
+        /// <summary>
+        /// Method to open a selected media file in the windows default viewer.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Play_Selected_Item_Click(object sender, RoutedEventArgs e)
         {
             int index = album_datagrid.Items.IndexOf(album_datagrid.SelectedItem);
@@ -295,6 +284,11 @@ namespace GalleryAppV2._0
             };
             Process.Start(psi);
         }
+
+        /// <summary>
+        /// Method to show a media file in the slideshow frame.
+        /// </summary>
+        /// <param name="index">index of the media file from an album.</param>
         private void ShowMediaFileAtIndex(int index)
         {
             Album album = albumManager.GetAlbumAtIndex(openAlbumIndex);
@@ -319,16 +313,33 @@ namespace GalleryAppV2._0
                 else { PlayNext(); }                
             }
         }
+
+        /// <summary>
+        /// Event to be called when an image has been shown for a given interval
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="args"></param>
         private void OnImagePlayFinished(object source, System.EventArgs args)
         {
                 PlayNext();
         }
+
+        /// <summary>
+        /// Event to be called when a video has been played until finished
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="args"></param>
         private void OnVideoPlayFinished(object source, EventArgs args)
         {
             PlayNext();
         }
+
+        /// <summary>
+        /// Method to show next enabled item in an album on the slideshow frame.
+        /// </summary>
         private void PlayNext()
         {
+            //Stop timer and nullify the instance of the image page.
             if (imageFrame != null)
             {
                 imageFrame.StopTimer();
@@ -338,14 +349,26 @@ namespace GalleryAppV2._0
                 currentSlideshowIndex++;
                 ShowMediaFileAtIndex(currentSlideshowIndex);
             }
+            //Stop the slideshow when playing is finished.
             else if (currentSlideshowIndex + 1 == albumManager.GetAlbumAtIndex(openAlbumIndex).MediaFiles.Count)
                 StopSlideshow();
-
         }
+
+        /// <summary>
+        /// Action method to navigate to next enabled media file in an album.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void next_btn_Click(object sender, RoutedEventArgs e)
         {
             PlayNext();
         }
+
+        /// <summary>
+        /// Action method to navigate to the previous enabled media file in an album.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void previous_btn_Click(object sender, RoutedEventArgs e)
         {
             if (currentSlideshowIndex != 0)
@@ -359,6 +382,12 @@ namespace GalleryAppV2._0
                 ShowMediaFileAtIndex(currentSlideshowIndex);
             }
         }
+
+        /// <summary>
+        /// ESC button event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void EscButtonHandler(object sender, KeyEventArgs e)
         {
             if(e.Key==Key.Escape)
@@ -366,6 +395,10 @@ namespace GalleryAppV2._0
                 StopSlideshow();
             }
         }
+
+        /// <summary>
+        /// Method to stop the slideshow and the timers.
+        /// </summary>
         private void StopSlideshow()
         {
             if(imageFrame!=null)
@@ -377,6 +410,12 @@ namespace GalleryAppV2._0
             SlideshowFrame.Content = null;
             MessageBox.Show("Slideshow finished playing");
         }
+
+        /// <summary>
+        /// Method to Enable/disable all items in the datagrid.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Toggle_Selection(object sender, RoutedEventArgs e)
         {
             Album album = albumManager.GetAlbumAtIndex(openAlbumIndex);
@@ -395,6 +434,75 @@ namespace GalleryAppV2._0
                 }
             }
             album_datagrid.Items.Refresh();
+        }
+        /// <summary>
+        /// Method to show open file dialog to let user open a bin file to load data.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void Open_Menu_Click(object sender, RoutedEventArgs e)
+        {
+            string errorMessage;
+
+            //Import saved data from Data.bin file
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Bin file (*.bin)|*.bin";
+            if(openFileDialog.ShowDialog()==true)
+            {
+                albumManager = SerializationHelper.Deserialize(openFileDialog.FileName, out errorMessage);
+                if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    MessageBox.Show(errorMessage);
+                }
+                AlbumsTv.ItemsSource = albumManager.GetAlbums();
+
+            }
+
+        }
+
+        /// <summary>
+        /// Method to show save file dialog to let user save a bin file that contains the albums.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void SaveAs_Menu_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Bin file (*.bin)|*.bin";
+            if(saveFileDialog.ShowDialog() == true)
+            {
+                SerializationHelper.Serialize(albumManager, saveFileDialog.FileName);
+            }
+        }
+
+        /// <summary>
+        /// Exits the application
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void Exit_Menu_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        /// <summary>
+        /// Ctrl+O Commmand event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Open_CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Open_Menu_Click(sender, e);
+        }
+
+        /// <summary>
+        /// Ctrl+O Commmand event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SaveAs_CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+           SaveAs_Menu_Click(sender, e);
         }
     }
 }
