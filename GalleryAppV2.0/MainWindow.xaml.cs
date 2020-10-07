@@ -1,10 +1,12 @@
 ﻿using BusinessLayer;
 using DataAccess;
 using Microsoft.Win32;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 
 namespace GalleryAppV2._0
 {
@@ -15,10 +17,13 @@ namespace GalleryAppV2._0
     {      
         AlbumManager albumManager ;
         private int openAlbumIndex= -1;
+        int currentSlideshowIndex = 0;
+        ImageFrame imageFrame;
 
         public MainWindow()
         {
             InitializeComponent();
+            this.PreviewKeyDown += new KeyEventHandler(EscButtonHandler);
             MyInitialization();
         }
 
@@ -210,6 +215,10 @@ namespace GalleryAppV2._0
             int index = AlbumsTv.Items.IndexOf(AlbumsTv.SelectedItem);
             openAlbumIndex = index;
             ShowAlbumContent(index);
+
+            SlideshowFrame.Content = null;
+            currentSlideshowIndex = 0;
+
         }
 
         ///// <summary>
@@ -268,13 +277,12 @@ namespace GalleryAppV2._0
         /// <param name="e"></param>
         private void PlaySlideshow_Button_Click(object sender, RoutedEventArgs e)
         {
+            currentSlideshowIndex = 0;
             Album album = albumManager.GetAlbumAtIndex(openAlbumIndex);
             if (album.MediaFiles.Count >0)
             {
-                int currentSlideshowIndex = 0;
-
-            }
-
+                ShowMediaFileAtIndex(currentSlideshowIndex);
+            }            
         }
 
         private void Play_Selected_Item_Click(object sender, RoutedEventArgs e)
@@ -286,6 +294,99 @@ namespace GalleryAppV2._0
                 UseShellExecute = true 
             };
             Process.Start(psi);
+        }
+        private void ShowMediaFileAtIndex(int index)
+        {
+            Album album = albumManager.GetAlbumAtIndex(openAlbumIndex);
+            if (currentSlideshowIndex >= 0 && currentSlideshowIndex < album.MediaFiles.Count)
+            {
+                if(album.MediaFiles[index].PlayEnabled)
+                {
+                    if (album.MediaFiles[index] is ImageFile)
+                    {
+                        //ImageFrame imageFrame = new ImageFrame(slideshow.SlideshowItems[index].MediaFile.FilePath,slideshow.SlideshowItems[index].Time);
+                        imageFrame = new ImageFrame(album.MediaFiles[index].FilePath, album.MediaFiles[index].Time);
+                        imageFrame.ImagePlayFinished += OnImagePlayFinished;
+                        SlideshowFrame.Content = imageFrame;
+                    }
+                    else if (album.MediaFiles[index] is VideoFile)
+                    {
+                        VideoFrame videoFrame = new VideoFrame(album.MediaFiles[index].FilePath);
+                        videoFrame.VideoPlayFinished += OnVideoPlayFinished;
+                        SlideshowFrame.Content = videoFrame;
+                    }
+                }
+                else { PlayNext(); }
+                
+            }
+        }
+        private void OnImagePlayFinished(object source, System.EventArgs args)
+        {
+            if (albumManager.GetAlbumAtIndex(openAlbumIndex).MediaFiles[currentSlideshowIndex] is ImageFile)
+                PlayNext();
+        }
+        private void OnVideoPlayFinished(object source, EventArgs args)
+        {
+            PlayNext();
+        }
+        private void PlayNext()
+        {
+            if (imageFrame != null)
+            {
+                imageFrame.StopTimer();
+            }
+            if (currentSlideshowIndex + 1 != albumManager.GetAlbumAtIndex(openAlbumIndex).MediaFiles.Count)
+            {
+                currentSlideshowIndex++;
+                ShowMediaFileAtIndex(currentSlideshowIndex);
+            }
+            if(currentSlideshowIndex + 1 == albumManager.GetAlbumAtIndex(openAlbumIndex).MediaFiles.Count)
+                StopSlideshow();
+        }
+        private void next_btn_Click(object sender, RoutedEventArgs e)
+        {
+            PlayNext();
+        }
+        private void previous_btn_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentSlideshowIndex != 0)
+            {
+                currentSlideshowIndex--;
+                ShowMediaFileAtIndex(currentSlideshowIndex);
+            }
+        }
+        private void EscButtonHandler(object sender, KeyEventArgs e)
+        {
+            if(e.Key==Key.Escape)
+            {
+                StopSlideshow();
+            }
+        }
+        private void StopSlideshow()
+        {
+            imageFrame.StopTimer();
+            imageFrame = null;
+            currentSlideshowIndex = 0;
+            SlideshowFrame.Content = null;
+        }
+        private void Toggle_Selection(object sender, RoutedEventArgs e)
+        {
+            Album album = albumManager.GetAlbumAtIndex(openAlbumIndex);
+            if(album.MediaFiles.All(x => x.PlayEnabled))
+            {
+                foreach(MediaFile mediaFile in album.MediaFiles)
+                {
+                    mediaFile.PlayEnabled = false;
+                }    
+            }
+            else
+            {
+                foreach (MediaFile mediaFile in album.MediaFiles)
+                {
+                    mediaFile.PlayEnabled = true;
+                }
+            }
+            album_datagrid.Items.Refresh();
         }
     }
 }

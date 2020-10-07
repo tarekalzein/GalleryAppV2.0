@@ -90,11 +90,13 @@
                         </DockPanel>
                     </Grid>
                     <Grid Grid.Row="1">
-                        <Frame x:Name="SlideshowFrame">
+                        <Frame x:Name="SlideshowFrame" NavigationUIVisibility="Hidden">
 
                         </Frame>
-                        <Button x:Name="previous_btn" Content="3" HorizontalAlignment="Left" Style="{StaticResource slideshow_navigation}"/>
-                        <Button x:Name="next_btn" Content="4" HorizontalAlignment="Right" Style="{StaticResource slideshow_navigation}"/>
+                        <Button x:Name="previous_btn" Content="3" HorizontalAlignment="Left" Style="{StaticResource slideshow_navigation}"
+                                Click="previous_btn_Click"/>
+                        <Button x:Name="next_btn" Content="4" HorizontalAlignment="Right" Style="{StaticResource slideshow_navigation}"
+                                Click="next_btn_Click"/>
 
                     </Grid>
                 </Grid>
@@ -114,7 +116,10 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Header="Add to slideshow">
+                                <DataGridTemplateColumn >
+                                    <DataGridTemplateColumn.Header>
+                                        <Button Content="Add to slideshow" Background="Transparent" BorderThickness="0" Click="Toggle_Selection"></Button>
+                                    </DataGridTemplateColumn.Header>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <CheckBox IsChecked="{Binding PlayEnabled, UpdateSourceTrigger=PropertyChanged}"/>
