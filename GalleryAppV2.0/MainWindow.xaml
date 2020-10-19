@@ -10,12 +10,44 @@
         Height="600" Width="800">
     <!--Height="600" Width="800"-->
     <!--Height="{Binding SystemParameters.PrimaryScreenHeight}" Width="{Binding SystemParameters.PrimaryScreenWidth}"-->
+
+    <Window.Resources>
+        <Style x:Key="slideshow_navigation" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="FontFamily" Value="Marlett"/>
+            <Setter Property="FontSize" Value="40"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="Transparent"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="Gray"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Key="O" Modifiers="Ctrl" Command="Open"/>
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="SaveAs"/>
+    </Window.InputBindings>
+    <Window.CommandBindings>
+        <CommandBinding Command="Open" Executed="Open_CommandBinding_Executed"/>
+        <CommandBinding Command="SaveAs" Executed="SaveAs_CommandBinding_Executed"/>
+    </Window.CommandBindings>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
+            <Menu>
+                <MenuItem Header="File">
+                    <MenuItem Header="Open" Click="Open_Menu_Click" InputGestureText="Ctrl+O"/>
+                    <MenuItem Header="Save As" Click="SaveAs_Menu_Click" InputGestureText="Ctrl+S"/>
+                    <Separator/>
+                    <MenuItem Header="Exit" Click="Exit_Menu_Click" InputGestureText="Alt+F4"/>
+                </MenuItem>
+            </Menu>
             <!--this grid to contain the Menu-->
         </Grid>
         <Grid Grid.Row="1">
@@ -49,7 +81,6 @@
                                         <Image Source="/Assets/icons8-photo-gallery-100.png" Width="16" Height="16" Margin="10 0"/>
                                         <TextBlock Text="{Binding AlbumTitle}"/>
                                     </StackPanel>
-
                                 </HierarchicalDataTemplate>
                             </TreeView.Resources>
                             
@@ -70,52 +101,19 @@
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0" Margin="5">
                         <DockPanel Background="Gray">
-                            <StackPanel Margin="10 0">
-                                <TextBlock x:Name="AlbumName_TextBlock"  FontSize="24" HorizontalAlignment="Left" DockPanel.Dock="Top" Margin="0"/>
-                                <TextBlock x:Name="AlbumDescription_textBlock" Text="Create or choose an album to show its content" HorizontalAlignment="Left" DockPanel.Dock="Bottom" TextWrapping="Wrap" MaxWidth="500" />
-                            </StackPanel>
-                            <Button Content="Add images" Width="30" HorizontalAlignment="Right" DockPanel.Dock="Top" Margin="10 5" Click="import_fileDialogue_Click"
-                                    ToolTip="Import new media files to the current album"/>
+                                <TextBlock x:Name="AlbumName_TextBlock"  FontSize="24" HorizontalAlignment="Left" DockPanel.Dock="Top" Margin="2 0"/>
+                            <TextBlock x:Name="AlbumDescription_textBlock" Margin="2 0" Text="Create or choose an album to show its content" HorizontalAlignment="Left" DockPanel.Dock="Bottom" TextWrapping="Wrap" MaxWidth="500" />
                         </DockPanel>
                     </Grid>
                     <Grid Grid.Row="1">
-                    <!--this grid contains the album content-->
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel HorizontalAlignment="Center">
-                            <StackPanel>
-                                <ItemsControl x:Name="ListViewContent" ItemsSource="{Binding MediaFile}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <ToggleButton CommandParameter="{Binding}" Checked="ToggleButton_Click" Unchecked="ToggleButton_Click" >
-                                                    <ToggleButton.Style>
-                                                        <Style TargetType="{x:Type ToggleButton}">
-                                                            <Setter Property="Background" Value="White"/>
-                                                            <Setter Property="BorderThickness" Value="0"/>
-                                                            <Setter Property="Margin" Value="5"/>
-                                                            <Style.Triggers>
-                                                                <Trigger Property="IsChecked" Value="True">
-                                                                    <Setter Property="Background" Value="LightCyan"/>
-                                                                </Trigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </ToggleButton.Style>
-                                                    <StackPanel Margin="10" MaxWidth="200" MaxHeight="200">
-                                                        <Image Height="150" Width="200" Source="{Binding FileThumbnail}"/>
-                                                        <TextBlock Margin="5 0" Text="{Binding FileName}" FontWeight="Bold"/>
-                                                        <TextBlock Margin="5 0" Text="{Binding Description}" TextWrapping="WrapWithOverflow"/>
-                                                    </StackPanel>
-                                                </ToggleButton>
-                                            </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <WrapPanel/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>
-                            </StackPanel>
-                        </StackPanel>
-                    </ScrollViewer>
+                        <Frame x:Name="SlideshowFrame" NavigationUIVisibility="Hidden">
+
+                        </Frame>
+                        <Button x:Name="previous_btn" Content="3" HorizontalAlignment="Left" Style="{StaticResource slideshow_navigation}"
+                                Click="previous_btn_Click"/>
+                        <Button x:Name="next_btn" Content="4" HorizontalAlignment="Right" Style="{StaticResource slideshow_navigation}"
+                                Click="next_btn_Click"/>
+
                     </Grid>
                 </Grid>
                 <Grid Grid.Row="1">
@@ -125,18 +123,35 @@
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0" HorizontalAlignment="Stretch">
                         <!--this grid contains the datagrid to create a slide show-->
-                        <DataGrid x:Name="slideshow_datagrid" AutoGenerateColumns="False" CanUserAddRows="False">
+                        <DataGrid x:Name="album_datagrid" AutoGenerateColumns="False" CanUserAddRows="False">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="File name" Binding="{Binding MediaFile.FileName}"/>
-                                <DataGridTextColumn Header="Description" Binding="{Binding MediaFile.Description}" Width="*"/>
-                                <DataGridTextColumn Header="Time in sec" Binding="{Binding Time}"/>
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button FontFamily="Marlett" Click="Play_Selected_Item_Click">4</Button>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn >
+                                    <DataGridTemplateColumn.Header>
+                                        <Button Content="Add to slideshow" Background="Transparent" BorderThickness="0" Click="Toggle_Selection"></Button>
+                                    </DataGridTemplateColumn.Header>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding PlayEnabled, UpdateSourceTrigger=PropertyChanged}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="File name" Binding="{Binding FileName}"/>
+                                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
+                                <DataGridTextColumn Header="Time" Binding="{Binding Time}" />
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
                     <Grid Grid.Column="1">
                         <StackPanel>
                             <Button Content="Play" Click="PlaySlideshow_Button_Click"/>
-                            <Button Content="+" Click="Add_Button_Click"
+                            <Button Content="+" Click="import_fileDialogue_Click"
                                     ToolTip="Add selected media files to the slideshow"/>
                             <Button Content="5" FontFamily="Marlett" Click="Up_Button_Click"/>
                             <Button Content="6" FontFamily="Marlett" Click="Down_Button_Click"/>

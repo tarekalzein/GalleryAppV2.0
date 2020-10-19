@@ -14,11 +14,14 @@ namespace BusinessLayer
         public string Description { get; set; }
         public string FilePath { get; set; }
         public string FileThumbnail { get; set; }
+        public int Time { get; set; }
+        public bool PlayEnabled { get; set; }
         public MediaFile(string fileName, string description, string filePath)
         {
             FileName = fileName;
             Description = description;
             FilePath = filePath;
+            PlayEnabled = true;
         }
     }
 }
