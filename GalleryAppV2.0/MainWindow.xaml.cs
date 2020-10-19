@@ -433,7 +433,9 @@ namespace GalleryAppV2._0
                     mediaFile.PlayEnabled = true;
                 }
             }
-            album_datagrid.Items.Refresh();
+            //album_datagrid.Items.Refresh(); //Caused the app to crash if toggle button is triggered after editing rows.
+            album_datagrid.ItemsSource = null;
+            album_datagrid.ItemsSource = album.MediaFiles;
         }
         /// <summary>
         /// Method to show open file dialog to let user open a bin file to load data.
