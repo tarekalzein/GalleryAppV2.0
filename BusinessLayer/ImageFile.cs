@@ -10,6 +10,10 @@ namespace BusinessLayer
     [Serializable]
     public class ImageFile : MediaFile
     {
+        public ImageFile()
+        {
+
+        }
         public ImageFile(string fileName, string description, string filePath) : base(fileName, description, filePath)
         {
             FileThumbnail = filePath;

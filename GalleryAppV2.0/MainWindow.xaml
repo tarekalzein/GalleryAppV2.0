@@ -123,7 +123,7 @@
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0" HorizontalAlignment="Stretch">
                         <!--this grid contains the datagrid to create a slide show-->
-                        <DataGrid x:Name="album_datagrid" AutoGenerateColumns="False" CanUserAddRows="False">
+                        <DataGrid x:Name="album_datagrid" AutoGenerateColumns="False" CanUserAddRows="False" ItemsSource="{Binding}">
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn>
                                     <DataGridTemplateColumn.CellTemplate>
@@ -142,9 +142,9 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTextColumn Header="File name" Binding="{Binding FileName}"/>
-                                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
-                                <DataGridTextColumn Header="Time" Binding="{Binding Time}" />
+                                <DataGridTextColumn Header="File name" Binding="{Binding FileName,UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="Description" Binding="{Binding Description,UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                                <DataGridTextColumn Header="Time" Binding="{Binding Time,UpdateSourceTrigger=PropertyChanged}" />
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>

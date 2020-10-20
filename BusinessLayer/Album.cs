@@ -9,6 +9,7 @@ namespace BusinessLayer
     [Serializable]
     public class Album
     {
+        public int AlbumID { get; set; }
         public string AlbumTitle { get; set; }
         public ObservableCollection<MediaFile> MediaFiles { get; set; }
         public string AlbumDescription { get; set; }
