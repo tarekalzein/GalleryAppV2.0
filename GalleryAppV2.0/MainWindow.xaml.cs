@@ -390,6 +390,7 @@ namespace GalleryAppV2._0
             if(e.Key==Key.Escape)
             {
                 StopSlideshow();
+                //TODO: make esc button work only when a slideshow is open......now anytime user presses esc it will run StopSlideShow();
             }
         }
 
@@ -442,21 +443,22 @@ namespace GalleryAppV2._0
         /// <param name="e"></param>
         public void Open_Menu_Click(object sender, RoutedEventArgs e)
         {
-            string errorMessage;
+            //string errorMessage;
 
-            //Import saved data from Data.bin file
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Bin file (*.bin)|*.bin";
-            if(openFileDialog.ShowDialog()==true)
-            {
-                //albumManager = SerializationHelper.Deserialize(openFileDialog.FileName, out errorMessage);
-                //if (!string.IsNullOrEmpty(errorMessage))
-                //{
-                //    MessageBox.Show(errorMessage);
-                //}
-                //AlbumsTv.ItemsSource = albumManager.GetAlbums();
+            ////Import saved data from Data.bin file
+            //OpenFileDialog openFileDialog = new OpenFileDialog();
+            //openFileDialog.Filter = "Bin file (*.bin)|*.bin";
+            //if(openFileDialog.ShowDialog()==true)
+            //{
+            //    //albumManager = SerializationHelper.Deserialize(openFileDialog.FileName, out errorMessage);
+            //    //if (!string.IsNullOrEmpty(errorMessage))
+            //    //{
+            //    //    MessageBox.Show(errorMessage);
+            //    //}
+            //    //AlbumsTv.ItemsSource = albumManager.GetAlbums();
 
-            }
+            //}
+            MessageBox.Show("Importing bin files is no longer supported. Data is now saved to Database");
 
         }
 
@@ -467,12 +469,13 @@ namespace GalleryAppV2._0
         /// <param name="e"></param>
         public void SaveAs_Menu_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Bin file (*.bin)|*.bin";
-            if(saveFileDialog.ShowDialog() == true)
-            {
-                //SerializationHelper.Serialize(albumManager, saveFileDialog.FileName);
-            }
+            //SaveFileDialog saveFileDialog = new SaveFileDialog();
+            //saveFileDialog.Filter = "Bin file (*.bin)|*.bin";
+            //if (saveFileDialog.ShowDialog() == true)
+            //{
+            //    SerializationHelper.Serialize(albumManager, saveFileDialog.FileName);
+            //}
+            MessageBox.Show("Saving file as bin is no longer supported. Data is now saved to Database");
         }
 
         /// <summary>
@@ -526,7 +529,7 @@ namespace GalleryAppV2._0
         }
         private void OnSearchTextBoxTextChanged(object sender, RoutedEventArgs e)
         {
-            if( searchTextBox.Text =="")
+            if( searchTextBox.Text == "")
             {
                 AlbumsTv.ItemsSource = unitOfWork.Albums.GetAll();
             }
