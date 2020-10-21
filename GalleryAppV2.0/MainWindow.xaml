@@ -60,7 +60,7 @@
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0 2">
                         <Button Height="25" Width="25" Margin="5 0" Click="NewAlbum_Button_Click"
                                 ToolTip="Create a new album">
-                        <Image Source="toolbargraphics/icons8-photo-gallery-64.png"/>
+                            <Image Source="toolbargraphics/icons8-photo-gallery-64.png"/>
                         </Button>
                         <Button Height="25" Width="25" Margin="5 0"  Click="EditAlbum_Button_Click"
                                 ToolTip="Edit the selected album">
@@ -71,7 +71,10 @@
                             <Image Source="toolbargraphics/icons8-delete-64.png"/>
                         </Button>
                     </StackPanel>
-
+                    <DockPanel  DockPanel.Dock="Top" Margin="0 2">
+                        <Label>Search:</Label>
+                        <TextBox Name="searchTextBox" TextChanged="OnSearchTextBoxTextChanged" VerticalContentAlignment="Center" Margin="2"/>
+                    </DockPanel>
                     <ScrollViewer HorizontalAlignment="Stretch" VerticalScrollBarVisibility="Auto" VerticalAlignment="Stretch" HorizontalScrollBarVisibility="Auto">
                         <!--<TreeView x:Name="ContentTreeView" TreeViewItem.Selected="ContentTreeView_Selected" ItemsSource="{Binding}"/>-->
                         <TreeView x:Name="AlbumsTv" TreeViewItem.Selected="AlbumsTv_treeviewitem_Selected">

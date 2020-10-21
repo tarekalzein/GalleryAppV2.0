@@ -524,5 +524,16 @@ namespace GalleryAppV2._0
             unitOfWork.MediaFiles.Update(mediaFile.FileID, mediaFile);
             unitOfWork.Complete();
         }
+        private void OnSearchTextBoxTextChanged(object sender, RoutedEventArgs e)
+        {
+            if( searchTextBox.Text =="")
+            {
+                AlbumsTv.ItemsSource = unitOfWork.Albums.GetAll();
+            }
+            else
+            {
+                AlbumsTv.ItemsSource = unitOfWork.Albums.GetAll().Where(x => x.AlbumTitle.ToLower().Contains(searchTextBox.Text.ToLower()));
+            }
+        }
     }
 }
