@@ -20,5 +20,7 @@ namespace BusinessLayer.Repositories
 
         void Remove(TEntity entity);
         void RemoveRange(IEnumerable<TEntity> entities);
+
+        void Update(int id, TEntity updatedEntity);
     }
 }

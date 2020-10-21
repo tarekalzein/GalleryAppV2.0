@@ -2,7 +2,9 @@
 using DataAccess;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -20,6 +22,8 @@ namespace GalleryAppV2._0
     public partial class MainWindow : Window
     {
         UnitOfWork unitOfWork = new UnitOfWork(new GalleryAppContext());
+
+        List<MediaFile> albumContent;
 
         private int openAlbumIndex= -1;
         int currentSlideshowIndex = 0;
@@ -173,8 +177,10 @@ namespace GalleryAppV2._0
         /// <param name="index"></param>
         private void ShowAlbumContent(int id)
         {                
-            Album album= unitOfWork.Albums.Get(id);            
-            album_datagrid.ItemsSource = unitOfWork.MediaFiles.GetMediaFilesOfAlbum(id).ToList();
+            Album album= unitOfWork.Albums.Get(id);
+            //album_datagrid.ItemsSource = unitOfWork.MediaFiles.GetMediaFilesOfAlbum(id).ToList();
+            albumContent = unitOfWork.MediaFiles.GetMediaFilesOfAlbum(id).ToList();
+            album_datagrid.ItemsSource = albumContent;
             AlbumName_TextBlock.Text = album.AlbumTitle;
             AlbumDescription_textBlock.Text = album.AlbumDescription;
         }
@@ -192,7 +198,6 @@ namespace GalleryAppV2._0
 
             SlideshowFrame.Content = null;
             currentSlideshowIndex = 0;
-
         }
 
         ///// <summary>
@@ -202,15 +207,17 @@ namespace GalleryAppV2._0
         /// <param name="e"></param>
         private void Up_Button_Click(object sender, RoutedEventArgs e)
         {
-            //if (album_datagrid.SelectedItem != null)
-            //{
-            //    int index = album_datagrid.Items.IndexOf(album_datagrid.SelectedItem);
-            //    Album album = albumManager.GetAlbumAtIndex(openAlbumIndex);
-            //    if(index!=0)
-            //    {
-            //        album.MediaFiles.Move(index, index - 1);
-            //    }
-            //}
+            if (album_datagrid.SelectedItem != null)
+            {
+                int index = album_datagrid.Items.IndexOf(album_datagrid.SelectedItem);
+                if(index > 0)
+                {
+                    MediaFile item = albumContent[index];
+                    albumContent.RemoveAt(index);
+                    albumContent.Insert(index - 1, item);
+                    album_datagrid.Items.Refresh();
+                }
+            }
         }
 
         /// <summary>
@@ -220,16 +227,18 @@ namespace GalleryAppV2._0
         /// <param name="e"></param>
         private void Down_Button_Click(object sender, RoutedEventArgs e)
         {
-            //if (album_datagrid.SelectedItem != null)
-            //{
-            //    int index = album_datagrid.Items.IndexOf(album_datagrid.SelectedItem);
-            //    Album album = albumManager.GetAlbumAtIndex(openAlbumIndex);
-
-            //    if (index + 1 != album.MediaFiles.Count)
-            //        album.MediaFiles.Move(index, index + 1);
-            //}
+            if (album_datagrid.SelectedItem != null)
+            {
+                int index = album_datagrid.Items.IndexOf(album_datagrid.SelectedItem);
+                if (index + 1 != albumContent.Count)
+                {
+                    MediaFile item = albumContent[index];
+                    albumContent.RemoveAt(index);
+                    albumContent.Insert(index + 1, item);
+                    album_datagrid.Items.Refresh();
+                }
+            }
         }
-
         /// <summary>
         /// Method to remove a row (slideshow item) from the data grid.
         /// </summary>
@@ -242,8 +251,6 @@ namespace GalleryAppV2._0
                 unitOfWork.MediaFiles.Remove(album_datagrid.SelectedItem as MediaFile);
                 unitOfWork.Complete();
                 ShowAlbumContent(openAlbumIndex);
-
-
             }
         }
 
@@ -411,25 +418,26 @@ namespace GalleryAppV2._0
         /// <param name="e"></param>
         private void Toggle_Selection(object sender, RoutedEventArgs e)
         {
-            if(unitOfWork.MediaFiles.GetMediaFilesOfAlbum(openAlbumIndex).All(x => x.PlayEnabled))
+            if(albumContent.All(x => x.PlayEnabled))
             {
-                foreach(MediaFile mediaFile in unitOfWork.MediaFiles.GetMediaFilesOfAlbum(openAlbumIndex))
+                foreach(MediaFile mediaFile in albumContent)
                 {
                     mediaFile.PlayEnabled = false;
-                }    
+                    unitOfWork.MediaFiles.Update(mediaFile.FileID, mediaFile);
+                }               
             }
             else
             {
-                foreach (MediaFile mediaFile in unitOfWork.MediaFiles.GetMediaFilesOfAlbum(openAlbumIndex))
+                foreach (MediaFile mediaFile in albumContent)
                 {
                     mediaFile.PlayEnabled = true;
+                    unitOfWork.MediaFiles.Update(mediaFile.FileID, mediaFile);
                 }
             }
             unitOfWork.Complete();
-            //album_datagrid.Items.Refresh(); //Caused the app to crash if toggle button is triggered after editing rows.
-            album_datagrid.ItemsSource = null;
-            album_datagrid.ItemsSource = unitOfWork.MediaFiles.GetMediaFilesOfAlbum(openAlbumIndex).ToList();
+            album_datagrid.Items.Refresh();
         }
+
         /// <summary>
         /// Method to show open file dialog to let user open a bin file to load data.
         /// </summary>
@@ -508,6 +516,15 @@ namespace GalleryAppV2._0
 
         private void album_datagrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
+            MediaFile mediaFile = album_datagrid.SelectedItem as MediaFile;
+            unitOfWork.MediaFiles.Update(mediaFile.FileID, mediaFile) ;
+            unitOfWork.Complete();
+        }
+
+        private void CheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            MediaFile mediaFile = album_datagrid.SelectedItem as MediaFile;
+            unitOfWork.MediaFiles.Update(mediaFile.FileID, mediaFile);
             unitOfWork.Complete();
         }
     }

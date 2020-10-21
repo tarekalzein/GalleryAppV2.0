@@ -52,5 +52,12 @@ namespace DataAccess.Repositories
             Context.Set<TEntity>().RemoveRange(entities);
         }
 
+        public void Update(int id, TEntity updatedEntity)
+        {
+            var entity = Context.Set<TEntity>().Find(id);
+            if (entity == null)
+                return;
+            Context.Entry(entity).CurrentValues.SetValues(updatedEntity);
+        }
     }
 }

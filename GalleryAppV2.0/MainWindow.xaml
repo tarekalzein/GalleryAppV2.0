@@ -123,7 +123,7 @@
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0" HorizontalAlignment="Stretch">
                         <!--this grid contains the datagrid to create a slide show-->
-                        <DataGrid x:Name="album_datagrid" AutoGenerateColumns="False" CanUserAddRows="False" ItemsSource="{Binding}">
+                        <DataGrid x:Name="album_datagrid" AutoGenerateColumns="False" CanUserAddRows="False" ItemsSource="{Binding}" CellEditEnding="album_datagrid_CellEditEnding">
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn>
                                     <DataGridTemplateColumn.CellTemplate>
@@ -138,7 +138,7 @@
                                     </DataGridTemplateColumn.Header>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <CheckBox IsChecked="{Binding PlayEnabled, UpdateSourceTrigger=PropertyChanged}"/>
+                                            <CheckBox IsChecked="{Binding PlayEnabled, UpdateSourceTrigger=PropertyChanged}" Click="CheckBox_Click"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
