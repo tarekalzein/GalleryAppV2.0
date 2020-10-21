@@ -3,15 +3,12 @@ using DataAccess;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
 namespace GalleryAppV2._0
@@ -251,8 +248,7 @@ namespace GalleryAppV2._0
                 albumContent.Remove(album_datagrid.SelectedItem as MediaFile);
                 unitOfWork.MediaFiles.Remove(album_datagrid.SelectedItem as MediaFile);
                 unitOfWork.Complete();
-                album_datagrid.Items.Refresh();
-                
+                album_datagrid.Items.Refresh();                
             }
         }
 
@@ -263,12 +259,11 @@ namespace GalleryAppV2._0
         /// <param name="e"></param>
         private void PlaySlideshow_Button_Click(object sender, RoutedEventArgs e)
         {
-            //currentSlideshowIndex = 0;
-            //Album album = albumManager.GetAlbumAtIndex(openAlbumIndex);
-            //if (album.MediaFiles.Count >0)
-            //{
-            //    ShowMediaFileAtIndex(currentSlideshowIndex);
-            //}            
+            currentSlideshowIndex = 0;
+            if (albumContent!=null && albumContent.Count > 0)
+            {
+                ShowMediaFileAtIndex(currentSlideshowIndex);
+            }
         }
 
         /// <summary>
@@ -278,13 +273,14 @@ namespace GalleryAppV2._0
         /// <param name="e"></param>
         private void Play_Selected_Item_Click(object sender, RoutedEventArgs e)
         {
-            //int index = album_datagrid.Items.IndexOf(album_datagrid.SelectedItem);
-            ////Process.Start(albumManager.GetAlbumAtIndex(openAlbumIndex).MediaFiles[index].FilePath); //I don't know why it throws win32 exception
-            //var psi = new ProcessStartInfo() {
-            //    FileName = albumManager.GetAlbumAtIndex(openAlbumIndex).MediaFiles[index].FilePath,
-            //    UseShellExecute = true 
-            //};
-            //Process.Start(psi);
+            int index = album_datagrid.Items.IndexOf(album_datagrid.SelectedItem);
+            //Process.Start(albumManager.GetAlbumAtIndex(openAlbumIndex).MediaFiles[index].FilePath); //I don't know why it throws win32 exception
+            var psi = new ProcessStartInfo()
+            {
+                FileName = albumContent[index].FilePath,
+                UseShellExecute = true
+            };
+            Process.Start(psi);
         }
 
         /// <summary>
@@ -292,22 +288,21 @@ namespace GalleryAppV2._0
         /// </summary>
         /// <param name="index">index of the media file from an album.</param>
         private void ShowMediaFileAtIndex(int index)
-        {
-            Album album = unitOfWork.Albums.Get(openAlbumIndex);
-            if (currentSlideshowIndex >= 0 && currentSlideshowIndex < album.MediaFiles.Count)
+        {           
+            if (currentSlideshowIndex >= 0 && currentSlideshowIndex < albumContent.Count)
             {
-                if(album.MediaFiles[index].PlayEnabled)
+                if(albumContent[index].PlayEnabled)
                 {
-                    if (album.MediaFiles[index] is ImageFile)
+                    if (albumContent[index] is ImageFile)
                     {
                         //ImageFrame imageFrame = new ImageFrame(slideshow.SlideshowItems[index].MediaFile.FilePath,slideshow.SlideshowItems[index].Time);
-                        imageFrame = new ImageFrame(album.MediaFiles[index].FilePath, album.MediaFiles[index].Time);
+                        imageFrame = new ImageFrame(albumContent[index].FilePath, albumContent[index].Time);
                         imageFrame.ImagePlayFinished += OnImagePlayFinished;
                         SlideshowFrame.Content = imageFrame;
                     }
-                    else if (album.MediaFiles[index] is VideoFile)
+                    else if (albumContent[index] is VideoFile)
                     {
-                        VideoFrame videoFrame = new VideoFrame(album.MediaFiles[index].FilePath);
+                        VideoFrame videoFrame = new VideoFrame(albumContent[index].FilePath);
                         videoFrame.VideoPlayFinished += OnVideoPlayFinished;
                         SlideshowFrame.Content = videoFrame;
                     }
@@ -341,19 +336,19 @@ namespace GalleryAppV2._0
         /// </summary>
         private void PlayNext()
         {
-            ////Stop timer and nullify the instance of the image page.
-            //if (imageFrame != null)
-            //{
-            //    imageFrame.StopTimer();
-            //}
-            //if (currentSlideshowIndex + 1 != albumManager.GetAlbumAtIndex(openAlbumIndex).MediaFiles.Count)
-            //{
-            //    currentSlideshowIndex++;
-            //    ShowMediaFileAtIndex(currentSlideshowIndex);
-            //}
-            ////Stop the slideshow when playing is finished.
-            //else if (currentSlideshowIndex + 1 == albumManager.GetAlbumAtIndex(openAlbumIndex).MediaFiles.Count)
-            //    StopSlideshow();
+            //Stop timer and nullify the instance of the image page.
+            if (imageFrame != null)
+            {
+                imageFrame.StopTimer();
+            }
+            if (currentSlideshowIndex + 1 != albumContent.Count)
+            {
+                currentSlideshowIndex++;
+                ShowMediaFileAtIndex(currentSlideshowIndex);
+            }
+            //Stop the slideshow when playing is finished.
+            else if (currentSlideshowIndex + 1 == albumContent.Count)
+                StopSlideshow();
         }
 
         /// <summary>
