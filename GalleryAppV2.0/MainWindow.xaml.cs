@@ -248,9 +248,11 @@ namespace GalleryAppV2._0
         {
             if (album_datagrid.SelectedItem != null)
             {
+                albumContent.Remove(album_datagrid.SelectedItem as MediaFile);
                 unitOfWork.MediaFiles.Remove(album_datagrid.SelectedItem as MediaFile);
                 unitOfWork.Complete();
-                ShowAlbumContent(openAlbumIndex);
+                album_datagrid.Items.Refresh();
+                
             }
         }
 
