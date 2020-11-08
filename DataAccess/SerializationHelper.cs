@@ -143,6 +143,8 @@ namespace DataAccess
                         }
                     }
                 }
+                else
+                    throw new FileNotFoundException("File not found");
             }
             catch (SerializationException e)
             {

@@ -40,8 +40,8 @@ namespace BusinessLayer
         /// <param name="index">Index of the targeted album</param>
         public void RemoveAlbum(int index)
         {
-            //todo: add check for index (out of range exception);
-            albumList.RemoveAt(index);
+            if(VerifyIndex(index))
+                albumList.RemoveAt(index);
         }
         /// <summary>
         /// Method to retreieve a single album at a specific index
@@ -50,7 +50,10 @@ namespace BusinessLayer
         /// <returns>Instance of Album</returns>
         public Album GetAlbumAtIndex(int index)
         {
+            if (VerifyIndex(index))
                 return albumList[index];
+            else
+                return null;
         }
         /// <summary>
         /// Method to retrieve the count of media files in an album.
@@ -59,6 +62,13 @@ namespace BusinessLayer
         public int Count()
         {
             return albumList.Count;
+        }
+        public bool VerifyIndex(int index)
+        {
+            if (index < albumList.Count)
+                return true;
+            else
+                return false;
         }
     }
 }
